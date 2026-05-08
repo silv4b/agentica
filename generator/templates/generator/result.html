@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% block title %}AGENTS.md Gerado{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.0/styles/atom-one-dark.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.0/highlight.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2.9.0/dist/highlightjs-line-numbers.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>document.addEventListener('DOMContentLoaded',function(){hljs.highlightAll();hljs.lineNumbersBlock(document.getElementById('agents-content'))});</script>
+<style>
+  pre code.hljs table.hljs-ln {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  pre code.hljs table.hljs-ln tr {
+    background: transparent !important;
+  }
+  pre code.hljs td.hljs-ln-numbers {
+    text-align: right;
+    color: #6e7681;
+    border-right: 1px solid #30363d;
+    vertical-align: top;
+    padding: 0 10px;
+    user-select: none;
+    width: 1%;
+    min-width: 44px;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+  pre code.hljs td.hljs-ln-code {
+    padding-left: 12px;
+  }
+  pre code.hljs .hljs-ln-n {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  @media (max-width: 500px) {
+    .sidebar-drawer {
+      position: fixed;
+      top: 3.5rem;
+      right: 0;
+      bottom: 0;
+      width: 16rem;
+      z-index: 40;
+      background-color: var(--bg-card);
+      border-left: 1px solid var(--border);
+      box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    .sidebar-drawer.open {
+      transform: translateX(0);
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 35;
+    }
+    .sidebar-overlay.open {
+      display: block;
+    }
+    .sidebar-toggle-mobile { display: inline-flex; }
+  }
+  @media (min-width: 501px) {
+    .sidebar-toggle-mobile { display: none; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-row min-h-screen">
+    <div class="flex-1 w-0 px-4 py-8">
+        <button id="sidebar-toggle" class="sidebar-toggle-mobile w-8 h-8 items-center justify-center rounded hover:bg-hover text-secondary mb-3" aria-label="Abrir tecnologias">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"/>
+            </svg>
+        </button>
+        <div id="template-container">
+            <div class="bg-card border border-theme rounded">
+                <div class="flex flex-wrap justify-between items-center p-3 border-b border-theme gap-2">
+                    <h2 id="template-title" class="text-base font-semibold text-primary">
+                        AGENTS.md
+                        {% if lang == "pt" %}
+                            <span class="text-sm font-normal text-muted ml-2">para {{ tech_list }}</span>
+                        {% else %}
+                            <span class="text-sm font-normal text-muted ml-2">for {{ tech_list }}</span>
+                        {% endif %}
+                    </h2>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="copyContent()" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
+                            <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                            <span>{% if lang == "pt" %}Copiar{% else %}Copy{% endif %}</span>
+                        </button>
+                        <button onclick="downloadContent()" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
+                            <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span>{% if lang == "pt" %}Download{% else %}Download{% endif %}</span>
+                        </button>
+                        <button onclick="document.getElementById('gist-modal').showModal()" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
+                            <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            <span>Gist</span>
+                        </button>
+                        <a href="{% url 'index' %}" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
+                            <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 7h10v10M7 17L17 7" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>{% if lang == "pt" %}Novo{% else %}New{% endif %}</span>
+                        </a>
+                    </div>
+                </div>
+                <pre class="p-4 m-0 overflow-x-auto"><code id="agents-content" class="hljs" style="background:#282c34;color:#abb2bf;font-size:13px;line-height:1.45;white-space:pre;word-wrap:normal;">{{ agents_content }}</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div id="sidebar" class="sidebar-drawer w-56 shrink-0 border-l border-theme">
+        <div class="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto px-3 py-4">
+            <div class="flex items-center justify-between mb-3">
+                <span></span>
+                <button id="sidebar-close" class="sidebar-toggle-mobile w-6 h-6 items-center justify-center rounded hover:bg-hover text-secondary" aria-label="Fechar">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            {% if unmatched %}
+                <div class="mb-6">
+                    <h2 class="text-sm font-semibold text-primary mb-2">
+                        {% if lang == "pt" %}Tecnologias Não Reconhecidas{% else %}Unrecognized Technologies{% endif %}
+                    </h2>
+                    <div class="p-3 border border-yellow-200 rounded bg-yellow-50 text-sm text-yellow-800">
+                        <p class="font-medium mb-1">
+                            {% if lang == "pt" %}Estas não foram encontradas em nosso banco de dados:{% else %}These were not found in our database:{% endif %}
+                        </p>
+                        <p class="font-mono text-xs">{{ unmatched|join:", " }}</p>
+                        <p class="text-xs mt-1">
+                            {% if lang == "pt" %}Foram incluídas, mas sem comandos específicos.{% else %}They were included but without specific commands.{% endif %}
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <h2 class="text-sm font-semibold text-primary mb-2">
+                {% if lang == "pt" %}Gerado com{% else %}Generated with{% endif %}
+            </h2>
+            <p class="text-sm text-secondary mb-4">
+                {% if lang == "pt" %}
+                    {{ matched|length }} tecnologias encontradas
+                {% else %}
+                    {{ matched|length }} technologies matched
+                {% endif %}
+            </p>
+            <div class="flex flex-wrap gap-1.5">
+                {% for tech in matched %}
+                    <span class="px-2 py-0.5 text-xs border border-theme rounded text-secondary">{{ tech }}</span>
+                {% endfor %}
+            </div>
+            <div class="mt-6 pt-4 border-t border-theme">
+                <span class="text-xs text-muted">
+                    {% if lang == "pt" %}Idioma: Português{% else %}Language: English{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<dialog id="gist-modal" class="fixed inset-0 z-50">
+    <div class="fixed inset-0 bg-black/50" onclick="document.getElementById('gist-modal').close()"></div>
+    <div class="fixed inset-0 flex items-center justify-center p-4">
+        <div class="bg-card rounded-lg shadow-xl border border-theme w-full max-w-md">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-primary mb-2">
+                    {% if lang == "pt" %}Criar Gist no GitHub{% else %}Create GitHub Gist{% endif %}
+                </h3>
+                <p class="text-sm text-secondary mb-4">
+                    {% if lang == "pt" %}
+                        Insira seu <strong>GitHub Personal Access Token</strong> para criar um gist privado com seu AGENTS.md.
+                        O token precisa apenas da permissão <code class="bg-subtle px-1 rounded text-xs text-primary">gist</code>.
+                    {% else %}
+                        Enter your <strong>GitHub Personal Access Token</strong> to create a private gist with your AGENTS.md.
+                        The token only needs the <code class="bg-subtle px-1 rounded text-xs text-primary">gist</code> scope.
+                    {% endif %}
+                </p>
+
+                <div class="mb-4">
+                    <label class="text-sm font-medium text-primary block mb-1">GitHub Token</label>
+                    <input
+                        id="gist-token"
+                        type="password"
+                        class="w-full px-3 py-2 text-sm border border-theme rounded focus:border-hover focus:outline-none font-mono bg-input text-primary"
+                        placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                    >
+                    <p class="text-xs text-muted mt-1">
+                        {% if lang == "pt" %}Crie um token em{% else %}Create a token at{% endif %}
+                        <a class="text-secondary underline" href="https://github.com/settings/tokens" target="_blank" rel="noopener">github.com/settings/tokens</a>
+                    </p>
+                </div>
+
+                <div id="gist-status" class="mb-4 hidden"></div>
+
+                <div class="flex justify-end gap-2">
+                    <button onclick="closeGistModal()" class="px-3 py-1.5 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary">
+                        {% if lang == "pt" %}Cancelar{% else %}Cancel{% endif %}
+                    </button>
+                    <button onclick="createGist()" id="gist-submit-btn" class="px-3 py-1.5 text-sm border border-theme rounded border-hover focus:outline-none bg-card text-primary flex items-center gap-2">
+                        <span id="gist-btn-text">
+                            {% if lang == "pt" %}Criar Gist{% else %}Create Gist{% endif %}
+                        </span>
+                        <span id="gist-spinner" class="hidden">
+                            <svg class="animate-spin h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<script>
+var AGENTS_RAW = '{{ agents_content|escapejs }}';
+
+function _getContent() {
+    return AGENTS_RAW;
+}
+
+function copyContent() {
+    const content = _getContent();
+    navigator.clipboard.writeText(content).then(function() {
+        const btn = document.querySelector('[onclick="copyContent()"]');
+        const orig = btn.innerHTML;
+        btn.innerHTML = `
+            <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>{% if lang == "pt" %}Copiado!{% else %}Copied!{% endif %}</span>
+        `;
+        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = content;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    });
+}
+
+function downloadContent() {
+    const content = _getContent();
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'AGENTS.md';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function closeGistModal() {
+    document.getElementById('gist-modal').close();
+    document.getElementById('gist-modal').classList.add('hidden');
+}
+
+function showGistStatus(msg, type) {
+    const el = document.getElementById('gist-status');
+    el.className = 'mb-4 text-sm p-3 rounded border ' + (
+        type === 'success' ? 'border-green-200 bg-green-50 text-green-800' :
+        type === 'error' ? 'border-red-200 bg-red-50 text-red-800' :
+        type === 'warning' ? 'border-yellow-200 bg-yellow-50 text-yellow-800' :
+        'hidden'
+    );
+    el.innerHTML = msg;
+    el.classList.remove('hidden');
+}
+
+function setGistLoading(loading) {
+    document.getElementById('gist-submit-btn').disabled = loading;
+    document.getElementById('gist-spinner').classList.toggle('hidden', !loading);
+    document.getElementById('gist-btn-text').textContent = loading ? '{% if lang == "pt" %}Criando...{% else %}Creating...{% endif %}' : '{% if lang == "pt" %}Criar Gist{% else %}Create Gist{% endif %}';
+}
+
+async function createGist() {
+    const token = document.getElementById('gist-token').value.trim();
+    if (!token) {
+        showGistStatus('{% if lang == "pt" %}Informe seu GitHub token.{% else %}Enter your GitHub token.{% endif %}', 'warning');
+        return;
+    }
+
+    const content = _getContent();
+
+    setGistLoading(true);
+    showGistStatus('', '');
+    document.getElementById('gist-status').classList.add('hidden');
+
+    try {
+        const resp = await fetch('{% url "create_gist" %}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify({ content, token, description: 'AGENTS.md — generated by Agentica' }),
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            const detail = data.detail || data.error || 'Unknown error';
+            let msg = data.error || '{% if lang == "pt" %}Falha ao criar gist{% else %}Failed to create gist{% endif %}';
+            try {
+                const parsed = JSON.parse(detail);
+                msg = parsed.message || msg;
+            } catch {}
+            showGistStatus(msg, 'error');
+            setGistLoading(false);
+            return;
+        }
+
+        document.getElementById('gist-token').value = '';
+        setGistLoading(false);
+        showGistStatus(
+            '{% if lang == "pt" %}Gist criado! <a href="' + data.url + '" target="_blank" rel="noopener" class="underline font-medium">Abrir gist &rarr;</a>{% else %}Gist created! <a href="' + data.url + '" target="_blank" rel="noopener" class="underline font-medium">Open gist &rarr;</a>{% endif %}',
+            'success'
+        );
+    } catch (err) {
+        showGistStatus('{% if lang == "pt" %}Erro de rede: {% else %}Network error: {% endif %}' + err.message, 'error');
+        setGistLoading(false);
+    }
+}
+
+function toggleSidebar() {
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebar-overlay');
+    if (!sidebar) return;
+    sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('open');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var toggleBtn = document.getElementById('sidebar-toggle');
+    if (toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
+    var closeBtn = document.getElementById('sidebar-close');
+    if (closeBtn) closeBtn.addEventListener('click', toggleSidebar);
+});
+</script>
+{% endblock %}

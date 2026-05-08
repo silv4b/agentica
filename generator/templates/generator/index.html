@@ -1,0 +1,460 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Agentica - Gerar AGENTS.md{% endblock %}
+
+{% block extra_head %}
+<style>
+  .tag-input-wrapper { position: relative; }
+  .tag-container {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.375rem; padding: 0.5rem; cursor: text; min-height: 3rem;
+  }
+  .tag-container .tag {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+  }
+  .tag-container .tag .tag-remove {
+    cursor: pointer; font-size: 1rem; line-height: 1;
+    opacity: 0.6; transition: opacity 0.15s;
+  }
+  .tag-container .tag .tag-remove:hover { opacity: 1; }
+  .tag-container input.tag-text-input {
+    border: none; outline: none; background: transparent;
+    flex: 1; min-width: 120px; padding: 0.25rem 0.375rem;
+    font-family: inherit; font-size: 0.875rem;
+  }
+  .autocomplete-dropdown {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+    max-height: 220px; overflow-y: auto; display: none;
+  }
+  .autocomplete-dropdown.show { display: block; }
+  .autocomplete-dropdown .dropdown-item {
+    padding: 0.5rem 0.75rem; cursor: pointer; transition: background 0.15s;
+    font-size: 0.875rem;
+  }
+  .autocomplete-dropdown .dropdown-item:hover,
+  .autocomplete-dropdown .dropdown-item.active {
+    background-color: var(--bg-hover);
+  }
+  .autocomplete-dropdown .dropdown-item .match-highlight { font-weight: 600; }
+  .autocomplete-dropdown .dropdown-item .tech-category {
+    font-size: 0.7rem; color: var(--text-muted); margin-left: 0.5rem;
+  }
+  .tag-container:focus-within {
+    border-color: var(--border-hover);
+  }
+  @media (max-width: 500px) {
+    .sidebar-drawer {
+      position: fixed;
+      top: 3.5rem;
+      right: 0;
+      bottom: 0;
+      width: 16rem;
+      z-index: 40;
+      background-color: var(--bg-card);
+      border-left: 1px solid var(--border);
+      box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    .sidebar-drawer.open {
+      transform: translateX(0);
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 35;
+    }
+    .sidebar-overlay.open {
+      display: block;
+    }
+    .sidebar-toggle-mobile { display: inline-flex; }
+  }
+  @media (min-width: 501px) {
+    .sidebar-toggle-mobile { display: none; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-row min-h-screen">
+    <div class="flex-1 w-0 px-4 py-8">
+        <div class="relative max-w-[640px] mb-8">
+            <form id="tech-form" method="post" action="{% url 'result' %}">
+                {% csrf_token %}
+                {{ form.technologies }}
+                {{ form.language }}
+                <div class="tag-input-wrapper">
+                    <div id="tag-container" class="tag-container w-full px-3 py-2 text-sm text-primary border border-theme rounded bg-input">
+                        <input
+                            id="tag-input"
+                            type="text"
+                            class="tag-text-input text-primary"
+                            placeholder="Busque tecnologias (ex: python, django, react)..."
+                            autocomplete="off"
+                        >
+                    </div>
+                    <div id="autocomplete-dropdown" class="autocomplete-dropdown bg-card mt-1 rounded shadow-lg border border-theme">
+                    </div>
+                </div>
+                <div class="mt-3 flex flex-wrap items-center gap-2">
+                    <button type="submit" class="px-4 py-2 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary" style="padding-top: 6px; padding-bottom: 6px;">
+                        Gerar AGENTS.md
+                    </button>
+                    <div class="flex items-center border border-theme rounded overflow-hidden text-sm">
+                        <button type="button" id="lang-pt" class="lang-btn px-3 py-2 bg-subtle text-secondary font-medium" data-lang="pt">PT</button>
+                        <button type="button" id="lang-en" class="lang-btn px-3 py-2 text-muted hover:text-secondary" data-lang="en">EN</button>
+                    </div>
+                    <span class="text-xs text-muted">
+                        Pressione <kbd class="px-1 py-0.5 border border-theme rounded text-xs bg-subtle text-secondary">Enter</kbd> ou <kbd class="px-1 py-0.5 border border-theme rounded text-xs bg-subtle text-secondary">,</kbd> para adicionar
+                    </span>
+                </div>
+            </form>
+        </div>
+
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-primary">O que é um arquivo AGENTS.md?</h2>
+            <button id="sidebar-toggle" class="sidebar-toggle-mobile w-8 h-8 items-center justify-center rounded hover:bg-hover text-secondary" aria-label="Abrir tecnologias">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+        <div id="empty-state">
+            <div class="bg-card border border-theme rounded p-8">
+                <div class="space-y-4 text-sm text-secondary">
+                    <p>
+                        Um arquivo <code class="bg-subtle px-1 rounded text-primary">AGENTS.md</code> instrui agentes de IA sobre como trabalhar com seu projeto. Geralmente é colocado na raiz do repositório e fornece instruções, convenções e contexto para ferramentas de IA.
+                    </p>
+
+                    <h3 class="text-base font-medium text-primary">Usos comuns:</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>Definir como executar, testar e fazer lint do projeto</li>
+                        <li>Estabelecer convenções de código e estilo para agentes de IA</li>
+                        <li>Documentar a estrutura e arquitetura do projeto</li>
+                        <li>Fornecer contexto sobre dependências e frameworks</li>
+                        <li>Especificar etapas de configuração do ambiente</li>
+                    </ul>
+
+                    <h3 class="text-base font-medium text-primary">Seções básicas:</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><code class="bg-subtle px-1 rounded text-primary">run</code> — Como iniciar o servidor de desenvolvimento</li>
+                        <li><code class="bg-subtle px-1 rounded text-primary">test</code> — Como executar os testes</li>
+                        <li><code class="bg-subtle px-1 rounded text-primary">lint</code> — Como verificar a qualidade do código</li>
+                        <li><code class="bg-subtle px-1 rounded text-primary">build</code> — Como compilar para produção</li>
+                        <li><code class="bg-subtle px-1 rounded text-primary">style</code> — Preferências de estilo de código</li>
+                    </ul>
+
+                    <div class="mt-6 pt-6 border-t border-theme">
+                        <p class="mb-4 text-sm text-secondary">
+                            {% if supported_techs %}
+                                <span class="text-primary font-medium">{{ supported_techs|length }} tecnologias</span> suportadas. Digite uma tecnologia acima para começar:
+                            {% else %}
+                                Pronto para criar seu AGENTS.md? Digite as tecnologias acima:
+                            {% endif %}
+                        </p>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for tech in supported_techs %}
+                                <span class="px-2 py-0.5 text-xs border border-theme rounded hover:border-hover cursor-pointer text-secondary bg-hover tech-badge" data-tech="{{ tech }}">{{ tech }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div id="sidebar" class="sidebar-drawer w-56 shrink-0 border-l border-theme">
+        <div class="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto px-3 py-4">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-sm font-semibold text-primary">Tecnologias Suportadas</h2>
+                <button id="sidebar-close" class="sidebar-toggle-mobile w-6 h-6 items-center justify-center rounded hover:bg-hover text-secondary" aria-label="Fechar">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="relative mb-3">
+                <input
+                    id="sidebar-search"
+                    type="text"
+                    class="w-full px-3 py-2 text-sm border border-theme rounded bg-input text-primary placeholder-muted focus:outline-none"
+                    placeholder="Filtrar tecnologias..."
+                >
+            </div>
+            <div id="tech-list" class="space-y-1">
+                {% for tech in supported_techs %}
+                    <div class="tech-item text-xs text-secondary hover:text-primary cursor-pointer tech-badge px-2 py-1 rounded bg-hover" data-tech="{{ tech }}">
+                        {{ tech }}
+                    </div>
+                {% endfor %}
+            </div>
+            <div id="no-tech-match" class="hidden text-xs text-muted py-2">Nenhuma tecnologia encontrada.</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const knownTechs = {{ tech_json|safe }};
+
+    const tagInput = document.getElementById('tag-input');
+    const tagContainer = document.getElementById('tag-container');
+    const dropdown = document.getElementById('autocomplete-dropdown');
+    const hiddenInput = document.querySelector('input[name="technologies"]');
+    const form = document.getElementById('tech-form');
+    const badges = document.querySelectorAll('.tech-badge');
+
+    if (!tagInput || !tagContainer || !dropdown || !hiddenInput || !form) return;
+
+    let tags = [];
+    let activeIndex = -1;
+    let blurTimer = null;
+
+    function updateHiddenInput() {
+        hiddenInput.value = tags.join(', ');
+    }
+
+    function renderTags() {
+        tagContainer.querySelectorAll('.tag').forEach(el => el.remove());
+        tags.forEach((tag, idx) => {
+            const span = document.createElement('span');
+            span.className = 'tag px-2 py-0.5 text-xs border border-theme rounded bg-subtle text-secondary flex items-center gap-1';
+            span.innerHTML = `${escapeHtml(tag)} <span class="tag-remove" data-index="${idx}">&times;</span>`;
+            tagContainer.insertBefore(span, tagInput);
+        });
+        updateHiddenInput();
+    }
+
+    function addTag(text) {
+        const t = text.trim();
+        if (!t) return false;
+        if (tags.some(x => x.toLowerCase() === t.toLowerCase())) return false;
+        tags.push(t);
+        renderTags();
+        tagInput.value = '';
+        hideDropdown();
+        return true;
+    }
+
+    function removeTag(index) {
+        tags.splice(index, 1);
+        renderTags();
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function highlightMatch(text, query) {
+        const idx = text.toLowerCase().indexOf(query.toLowerCase());
+        if (idx === -1) return escapeHtml(text);
+        return escapeHtml(text.slice(0, idx)) + '<span class="match-highlight">' + escapeHtml(text.slice(idx, idx + query.length)) + '</span>' + escapeHtml(text.slice(idx + query.length));
+    }
+
+    function showDropdown(items) {
+        if (!items.length) {
+            hideDropdown();
+            return;
+        }
+        dropdown.innerHTML = '';
+        items.forEach((item, idx) => {
+            const div = document.createElement('div');
+            div.className = 'dropdown-item' + (idx === activeIndex ? ' active' : '');
+            div.dataset.index = idx;
+            div.dataset.value = item;
+            div.innerHTML = highlightMatch(item, tagInput.value.trim()) + '<span class="tech-category">tecnologia</span>';
+            div.addEventListener('click', function() {
+                if (addTag(item)) {
+                    tagInput.focus();
+                }
+            });
+            div.addEventListener('mouseenter', function() {
+                activeIndex = idx;
+                dropdown.querySelectorAll('.dropdown-item').forEach(function(el, i) {
+                    el.classList.toggle('active', i === idx);
+                });
+            });
+            dropdown.appendChild(div);
+        });
+        dropdown.classList.add('show');
+    }
+
+    function hideDropdown() {
+        dropdown.classList.remove('show');
+        dropdown.innerHTML = '';
+        activeIndex = -1;
+    }
+
+    function filterTechs(query) {
+        if (!query.trim()) return [];
+        const q = query.trim().toLowerCase();
+        return knownTechs.filter(function(t) {
+            if (tags.some(function(x) { return x.toLowerCase() === t.toLowerCase(); })) return false;
+            return t.toLowerCase().includes(q);
+        }).slice(0, 10);
+    }
+
+    tagInput.addEventListener('input', function() {
+        if (blurTimer) { clearTimeout(blurTimer); blurTimer = null; }
+        const query = tagInput.value;
+        if (query.endsWith(',') || query.endsWith(';')) {
+            const val = query.slice(0, -1).trim();
+            if (val) addTag(val);
+            tagInput.value = '';
+            hideDropdown();
+            return;
+        }
+        activeIndex = -1;
+        const results = filterTechs(query);
+        showDropdown(results);
+    });
+
+    tagInput.addEventListener('keydown', function(e) {
+        const items = dropdown.querySelectorAll('.dropdown-item');
+
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (items.length > 0) {
+                const idx = activeIndex >= 0 ? activeIndex : 0;
+                if (addTag(items[idx].dataset.value)) {
+                    tagInput.focus();
+                }
+            } else {
+                const val = tagInput.value.trim();
+                if (val) {
+                    addTag(val);
+                }
+            }
+            return;
+        }
+
+        if (e.key === ',') {
+            e.preventDefault();
+            const val = tagInput.value.replace(/,/g, '').trim();
+            if (val) addTag(val);
+            return;
+        }
+
+        if (e.key === 'Backspace' && !tagInput.value && tags.length) {
+            removeTag(tags.length - 1);
+            return;
+        }
+
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (!items.length) return;
+            items.forEach(function(el) { el.classList.remove('active'); });
+            if (e.key === 'ArrowDown') {
+                activeIndex = Math.min(activeIndex + 1, items.length - 1);
+            } else {
+                activeIndex = Math.max(activeIndex - 1, 0);
+            }
+            items[activeIndex].classList.add('active');
+            items[activeIndex].scrollIntoView({ block: 'nearest' });
+            return;
+        }
+
+        if (e.key === 'Escape') {
+            hideDropdown();
+        }
+    });
+
+    tagInput.addEventListener('blur', function() {
+        blurTimer = setTimeout(hideDropdown, 200);
+    });
+
+    tagInput.addEventListener('focus', function() {
+        if (blurTimer) { clearTimeout(blurTimer); blurTimer = null; }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.tag-input-wrapper')) return;
+    });
+
+    tagContainer.addEventListener('click', function(e) {
+        const removeBtn = e.target.closest('.tag-remove');
+        if (removeBtn) {
+            removeTag(parseInt(removeBtn.dataset.index));
+        } else if (e.target === tagContainer || e.target === tagInput) {
+            tagInput.focus();
+        }
+    });
+
+    form.addEventListener('submit', function(e) {
+        const val = tagInput.value.trim();
+        if (val) addTag(val);
+        updateHiddenInput();
+        if (!tags.length) {
+            e.preventDefault();
+            tagInput.focus();
+            tagInput.style.outline = 'none';
+            tagContainer.style.borderColor = 'var(--border-hover)';
+        }
+    });
+
+    badges.forEach(function(badge) {
+        badge.addEventListener('click', function() {
+            addTag(badge.dataset.tech);
+            tagInput.focus();
+        });
+    });
+
+    renderTags();
+
+    // Sidebar search
+    const sidebarSearch = document.getElementById('sidebar-search');
+    if (sidebarSearch) {
+        sidebarSearch.addEventListener('input', function() {
+            const q = this.value.trim().toLowerCase();
+            const items = document.querySelectorAll('.tech-item');
+            let visible = 0;
+            items.forEach(function(item) {
+                const match = !q || item.dataset.tech.toLowerCase().includes(q);
+                item.style.display = match ? '' : 'none';
+                if (match) visible++;
+            });
+            document.getElementById('no-tech-match').classList.toggle('hidden', visible > 0);
+        });
+    }
+
+    // Language toggle
+    const langInput = document.querySelector('select[name="language"], input[name="language"]');
+    const langBtns = document.querySelectorAll('.lang-btn');
+    function updateLangUI(lang) {
+        langBtns.forEach(function(btn) {
+            if (btn.dataset.lang === lang) {
+                btn.className = 'lang-btn px-3 py-1.5 bg-subtle text-secondary font-medium';
+            } else {
+                btn.className = 'lang-btn px-3 py-1.5 text-muted hover:text-secondary';
+            }
+        });
+        if (langInput) langInput.value = lang;
+    }
+    langBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            updateLangUI(btn.dataset.lang);
+        });
+    });
+    updateLangUI(langInput ? langInput.value : 'pt');
+
+    // Sidebar toggle (mobile drawer)
+    function toggleSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebar-overlay');
+        if (!sidebar) return;
+        sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('open');
+    }
+    document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
+    var sidebarClose = document.getElementById('sidebar-close');
+    if (sidebarClose) sidebarClose.addEventListener('click', toggleSidebar);
+});
+</script>
+{% endblock %}
