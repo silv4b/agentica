@@ -197,6 +197,28 @@ class TechDisplayNameTests(TestCase):
             "django": "Django",
             "react": "React",
             "python": "Python",
+            "angular": "Angular",
+            "aspnetcore": "ASP.NET Core",
+            "astro": "Astro",
+            "bash": "Bash",
+            "blazor": "Blazor",
+            "csharp": "C#",
+            "cplusplus": "C++",
+            "dart": "Dart",
+            "elasticsearch": "Elasticsearch",
+            "express": "Express",
+            "flask": "Flask",
+            "jest": "Jest",
+            "jquery": "jQuery",
+            "mariadb": "MariaDB",
+            "nestjs": "NestJS",
+            "nuxt.js": "Nuxt.js",
+            "playwright": "Playwright",
+            "ruby": "Ruby",
+            "sqlite": "SQLite",
+            "swift": "Swift",
+            "vite": "Vite",
+            "vitest": "Vitest",
         }
         for key, expected in cases.items():
             with self.subTest(key=key):
@@ -259,12 +281,12 @@ class LoadMdTests(TestCase):
         def controlled_exists(self):
             name = str(self)
             if "test_tech" in name:
-                return name.endswith(".md") and not name.endswith(".pt.md")
+                return "en" in self.parts
             return original_exists(self)
 
         def controlled_read_text(self, **kwargs):
             name = str(self)
-            if "test_tech" in name and ".pt.md" not in name:
+            if "test_tech" in name:
                 return "English test content"
             return original_read_text(self, **kwargs)
 
@@ -300,12 +322,12 @@ class LoadMdTests(TestCase):
         def controlled_exists(self):
             name = str(self)
             if "test_cache" in name:
-                return name.endswith(".md") and not name.endswith(".pt.md")
+                return "en" in self.parts
             return original_exists(self)
 
         def controlled_read_text(self, **kwargs):
             name = str(self)
-            if "test_cache" in name and ".pt.md" not in name:
+            if "test_cache" in name:
                 return "Cache test content"
             return original_read_text(self, **kwargs)
 
@@ -334,12 +356,12 @@ class LoadMdTests(TestCase):
         def controlled_exists(self):
             name = str(self)
             if "test_fail" in name:
-                return name.endswith(".md") and not name.endswith(".pt.md")
+                return "en" in self.parts
             return original_exists(self)
 
         def controlled_read_text(self, **kwargs):
             name = str(self)
-            if "test_fail" in name and ".pt.md" not in name:
+            if "test_fail" in name:
                 return "Original English text"
             return original_read_text(self, **kwargs)
 
@@ -367,10 +389,8 @@ class LoadMdTests(TestCase):
 
         def controlled_read_text(self, **kwargs):
             name = str(self)
-            if "test_prec.pt.md" in name:
-                return "Conteúdo PT"
-            if "test_prec.md" in name:
-                return "Base content"
+            if "test_prec" in name:
+                return "Conteúdo PT" if "pt" in self.parts else "Base content"
             return original_read_text(self, **kwargs)
 
         with (

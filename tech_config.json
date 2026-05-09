@@ -1,0 +1,434 @@
+{
+  "angular": {
+    "run": "ng serve",
+    "test": "ng test",
+    "lint": "ng lint",
+    "style": "",
+    "display_name": "Angular",
+    "devicon": "devicon-angular-plain"
+  },
+  "aspnetcore": {
+    "run": "dotnet run",
+    "test": "dotnet test",
+    "lint": "dotnet format",
+    "style": "",
+    "display_name": "ASP.NET Core",
+    "devicon": "devicon-dotnetcore-plain"
+  },
+  "astro": {
+    "run": "npm run dev",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Astro",
+    "devicon": "devicon-astro-plain"
+  },
+  "bash": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Bash",
+    "devicon": "devicon-bash-plain"
+  },
+  "blazor": {
+    "run": "dotnet run",
+    "test": "dotnet test",
+    "lint": "dotnet format",
+    "style": "",
+    "display_name": "Blazor",
+    "devicon": "devicon-love2d-plain"
+  },
+  "cplusplus": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "C++",
+    "devicon": "devicon-cplusplus-plain"
+  },
+  "csharp": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "C#",
+    "devicon": "devicon-csharp-plain"
+  },
+  "css": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "CSS",
+    "devicon": "devicon-css3-plain"
+  },
+  "daisyui": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "DaisyUI",
+    "devicon": "devicon-love2d-plain"
+  },
+  "dart": {
+    "run": "dart run",
+    "test": "dart test",
+    "lint": "dart analyze",
+    "style": "",
+    "display_name": "Dart",
+    "devicon": "devicon-dart-plain"
+  },
+  "django": {
+    "run": "python manage.py runserver",
+    "test": "python manage.py test",
+    "lint": "ruff check .",
+    "style": "",
+    "display_name": "Django",
+    "devicon": "devicon-django-plain"
+  },
+  "docker": {
+    "run": "docker compose up",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Docker",
+    "devicon": "devicon-docker-plain"
+  },
+  "elasticsearch": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Elasticsearch",
+    "devicon": "devicon-elasticsearch-plain"
+  },
+  "express": {
+    "run": "npm run dev",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Express",
+    "devicon": "devicon-express-original"
+  },
+  "fastapi": {
+    "run": "uvicorn app.main:app --reload",
+    "test": "pytest",
+    "lint": "ruff check .",
+    "style": "",
+    "display_name": "FastAPI",
+    "devicon": "devicon-fastapi-plain"
+  },
+  "flask": {
+    "run": "flask run",
+    "test": "pytest",
+    "lint": "ruff check .",
+    "style": "",
+    "display_name": "Flask",
+    "devicon": "devicon-flask-original"
+  },
+  "flutter": {
+    "run": "flutter run",
+    "test": "flutter test",
+    "lint": "flutter analyze",
+    "style": "",
+    "display_name": "Flutter",
+    "devicon": "devicon-flutter-plain"
+  },
+  "go": {
+    "run": "go run .",
+    "test": "go test ./...",
+    "lint": "golangci-lint run",
+    "style": "",
+    "display_name": "Go",
+    "devicon": "devicon-go-plain"
+  },
+  "html": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "HTML",
+    "devicon": "devicon-html5-plain"
+  },
+  "java": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Java",
+    "devicon": "devicon-java-plain"
+  },
+  "javascript": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "JavaScript",
+    "devicon": "devicon-javascript-plain"
+  },
+  "jest": {
+    "run": "",
+    "test": "npx jest",
+    "lint": "",
+    "style": "",
+    "display_name": "Jest",
+    "devicon": "devicon-jest-plain"
+  },
+  "jquery": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "jQuery",
+    "devicon": "devicon-jquery-plain"
+  },
+  "kotlin": {
+    "run": "./gradlew run",
+    "test": "./gradlew test",
+    "lint": "./gradlew ktlintCheck",
+    "style": "",
+    "display_name": "Kotlin",
+    "devicon": "devicon-kotlin-plain"
+  },
+  "laravel": {
+    "run": "php artisan serve",
+    "test": "php artisan test",
+    "lint": "./vendor/bin/pint",
+    "style": "",
+    "display_name": "Laravel",
+    "devicon": "devicon-laravel-original"
+  },
+  "mariadb": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "MariaDB",
+    "devicon": "devicon-mariadb-original"
+  },
+  "mongodb": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "MongoDB",
+    "devicon": "devicon-mongodb-plain"
+  },
+  "mysql": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "MySQL",
+    "devicon": "devicon-mysql-original"
+  },
+  "nestjs": {
+    "run": "npm run start:dev",
+    "test": "npm run test",
+    "lint": "npm run lint",
+    "style": "",
+    "display_name": "NestJS",
+    "devicon": "devicon-nestjs-plain"
+  },
+  "next.js": {
+    "run": "npm run dev",
+    "test": "npm run test",
+    "lint": "npm run lint",
+    "style": "",
+    "display_name": "Next.js",
+    "devicon": "devicon-nextjs-plain"
+  },
+  "node": {
+    "run": "npm run dev",
+    "test": "npm run test",
+    "lint": "npm run lint",
+    "style": "",
+    "display_name": "Node.js",
+    "devicon": "devicon-nodejs-plain"
+  },
+  "nuxt.js": {
+    "run": "npm run dev",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Nuxt.js",
+    "devicon": "devicon-nuxtjs-plain"
+  },
+  "php": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "PHP",
+    "devicon": "devicon-php-plain"
+  },
+  "playwright": {
+    "run": "",
+    "test": "npx playwright test",
+    "lint": "",
+    "style": "",
+    "display_name": "Playwright",
+    "devicon": "devicon-love2d-plain"
+  },
+  "postgresql": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "PostgreSQL",
+    "devicon": "devicon-postgresql-plain"
+  },
+  "python": {
+    "run": "python manage.py runserver",
+    "test": "pytest",
+    "lint": "ruff check .",
+    "style": "",
+    "display_name": "Python",
+    "devicon": "devicon-python-plain"
+  },
+  "rails": {
+    "run": "bin/rails server",
+    "test": "bin/rails test",
+    "lint": "rubocop",
+    "style": "",
+    "display_name": "Ruby on Rails",
+    "devicon": "devicon-rails-plain"
+  },
+  "react": {
+    "run": "npm run dev",
+    "test": "npm run test",
+    "lint": "npm run lint",
+    "style": "",
+    "display_name": "React",
+    "devicon": "devicon-react-original"
+  },
+  "redis": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Redis",
+    "devicon": "devicon-redis-plain"
+  },
+  "ruby": {
+    "run": "ruby script.rb",
+    "test": "",
+    "lint": "rubocop",
+    "style": "",
+    "display_name": "Ruby",
+    "devicon": "devicon-ruby-plain"
+  },
+  "rust": {
+    "run": "cargo run",
+    "test": "cargo test",
+    "lint": "cargo clippy",
+    "style": "",
+    "display_name": "Rust",
+    "devicon": "devicon-rust-original"
+  },
+  "sass": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Sass",
+    "devicon": "devicon-sass-original"
+  },
+  "scss": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "SCSS",
+    "devicon": "devicon-sass-original"
+  },
+  "spring": {
+    "run": "./mvnw spring-boot:run",
+    "test": "./mvnw test",
+    "lint": "./mvnw checkstyle:check",
+    "style": "",
+    "display_name": "Spring",
+    "devicon": "devicon-spring-original"
+  },
+  "springboot": {
+    "run": "./mvnw spring-boot:run",
+    "test": "./mvnw test",
+    "lint": "",
+    "style": "",
+    "display_name": "Spring Boot",
+    "devicon": "devicon-spring-original"
+  },
+  "sqlite": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "SQLite",
+    "devicon": "devicon-sqlite-plain"
+  },
+  "svelte": {
+    "run": "npm run dev",
+    "test": "npm run test",
+    "lint": "npm run lint",
+    "style": "",
+    "display_name": "Svelte",
+    "devicon": "devicon-svelte-plain"
+  },
+  "swift": {
+    "run": "swift run",
+    "test": "swift test",
+    "lint": "",
+    "style": "",
+    "display_name": "Swift",
+    "devicon": "devicon-swift-plain"
+  },
+  "tailwind": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Tailwind CSS",
+    "devicon": "devicon-tailwindcss-original"
+  },
+  "typescript": {
+    "run": "npm run dev",
+    "test": "npm run test",
+    "lint": "npx tsc --noEmit",
+    "style": "",
+    "display_name": "TypeScript",
+    "devicon": "devicon-typescript-plain"
+  },
+  "uv": {
+    "run": "",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "UV",
+    "devicon": "devicon-love2d-plain"
+  },
+  "vite": {
+    "run": "npm run dev",
+    "test": "",
+    "lint": "",
+    "style": "",
+    "display_name": "Vite",
+    "devicon": "devicon-vitejs-plain"
+  },
+  "vitest": {
+    "run": "",
+    "test": "npx vitest",
+    "lint": "",
+    "style": "",
+    "display_name": "Vitest",
+    "devicon": "devicon-love2d-plain"
+  },
+  "vue": {
+    "run": "npm run dev",
+    "test": "npm run test",
+    "lint": "npm run lint",
+    "style": "",
+    "display_name": "Vue.js",
+    "devicon": "devicon-vuejs-plain"
+  }
+}

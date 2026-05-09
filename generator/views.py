@@ -11,200 +11,17 @@ from .forms import TechForm
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-TECH_CONFIG = {
-    "python": {
-        "run": "python manage.py runserver",
-        "test": "pytest",
-        "lint": "ruff check .",
-        "style": "",
-    },
-    "django": {
-        "run": "python manage.py runserver",
-        "test": "python manage.py test",
-        "lint": "ruff check .",
-        "style": "",
-    },
-    "fastapi": {
-        "run": "uvicorn app.main:app --reload",
-        "test": "pytest",
-        "lint": "ruff check .",
-        "style": "",
-    },
-    "react": {
-        "run": "npm run dev",
-        "test": "npm run test",
-        "lint": "npm run lint",
-        "style": "",
-    },
-    "next.js": {
-        "run": "npm run dev",
-        "test": "npm run test",
-        "lint": "npm run lint",
-        "style": "",
-    },
-    "node": {
-        "run": "npm run dev",
-        "test": "npm run test",
-        "lint": "npm run lint",
-        "style": "",
-    },
-    "typescript": {
-        "run": "npm run dev",
-        "test": "npm run test",
-        "lint": "npx tsc --noEmit",
-        "style": "",
-    },
-    "docker": {
-        "run": "docker compose up",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "postgresql": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "redis": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "tailwind": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "daisyui": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "flutter": {
-        "run": "flutter run",
-        "test": "flutter test",
-        "lint": "flutter analyze",
-        "style": "",
-    },
-    "go": {
-        "run": "go run .",
-        "test": "go test ./...",
-        "lint": "golangci-lint run",
-        "style": "",
-    },
-    "rust": {
-        "run": "cargo run",
-        "test": "cargo test",
-        "lint": "cargo clippy",
-        "style": "",
-    },
-    "vue": {
-        "run": "npm run dev",
-        "test": "npm run test",
-        "lint": "npm run lint",
-        "style": "",
-    },
-    "svelte": {
-        "run": "npm run dev",
-        "test": "npm run test",
-        "lint": "npm run lint",
-        "style": "",
-    },
-    "spring": {
-        "run": "./mvnw spring-boot:run",
-        "test": "./mvnw test",
-        "lint": "./mvnw checkstyle:check",
-        "style": "",
-    },
-    "kotlin": {
-        "run": "./gradlew run",
-        "test": "./gradlew test",
-        "lint": "./gradlew ktlintCheck",
-        "style": "",
-    },
-    "rails": {
-        "run": "bin/rails server",
-        "test": "bin/rails test",
-        "lint": "rubocop",
-        "style": "",
-    },
-    "laravel": {
-        "run": "php artisan serve",
-        "test": "php artisan test",
-        "lint": "./vendor/bin/pint",
-        "style": "",
-    },
-    "uv": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "javascript": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "php": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "java": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "springboot": {
-        "run": "./mvnw spring-boot:run",
-        "test": "./mvnw test",
-        "lint": "",
-        "style": "",
-    },
-    "mysql": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "mongodb": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "html": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "css": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "scss": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-    "sass": {
-        "run": "",
-        "test": "",
-        "lint": "",
-        "style": "",
-    },
-}
+TECH_CONFIG_PATH = BASE_DIR / "tech_config.json"
+
+with open(TECH_CONFIG_PATH, encoding="utf-8") as f:
+    _TECH_DATA = json.load(f)
+
+TECH_CONFIG = {}
+for key, data in _TECH_DATA.items():
+    cmd = {}
+    for k in ("run", "test", "lint", "style"):
+        cmd[k] = data[k]
+    TECH_CONFIG[key] = cmd
 
 TEMPLATES_DIR = BASE_DIR / "agentictemplates"
 
@@ -215,18 +32,15 @@ _translation_cache = {}
 def _load_md(filename, lang="pt"):
     """Carrega o conteúdo de um arquivo Markdown, com fallback e tradução automática via Google Translator."""
 
-    path_lang = TEMPLATES_DIR / f"{filename}.{lang}.md"
+    path_lang = TEMPLATES_DIR / lang / f"{filename}.md"
     if path_lang.exists():
         return path_lang.read_text(encoding="utf-8")
 
-    path_fallback = TEMPLATES_DIR / f"{filename}.md"
-    if not path_fallback.exists():
+    path_en = TEMPLATES_DIR / "en" / f"{filename}.md"
+    if not path_en.exists():
         return ""
 
-    text = path_fallback.read_text(encoding="utf-8")
-
-    if lang == "en":
-        return text
+    text = path_en.read_text(encoding="utf-8")
 
     cache_key = (filename, lang)
     if cache_key in _translation_cache:
@@ -283,78 +97,12 @@ def _pick(items, prefer_keyword):
 
 def _tech_display_name(key: str) -> str:
     """Retorna o nome de exibição amigável de uma tecnologia a partir de sua chave."""
-    overrides = {
-        "next.js": "Next.js",
-        "javascript": "JavaScript",
-        "typescript": "TypeScript",
-        "html": "HTML",
-        "css": "CSS",
-        "scss": "SCSS",
-        "sass": "Sass",
-        "fastapi": "FastAPI",
-        "postgresql": "PostgreSQL",
-        "mongodb": "MongoDB",
-        "mysql": "MySQL",
-        "springboot": "Spring Boot",
-        "daisyui": "DaisyUI",
-        "tailwind": "Tailwind CSS",
-        "uv": "UV",
-        "php": "PHP",
-        "java": "Java",
-        "go": "Go",
-        "rust": "Rust",
-        "vue": "Vue.js",
-        "node": "Node.js",
-        "flutter": "Flutter",
-        "kotlin": "Kotlin",
-        "rails": "Ruby on Rails",
-        "svelte": "Svelte",
-        "laravel": "Laravel",
-        "docker": "Docker",
-        "redis": "Redis",
-        "spring": "Spring",
-        "django": "Django",
-        "react": "React",
-        "python": "Python",
-    }
-    return overrides.get(key, key.capitalize())
+    return _TECH_DATA.get(key, {}).get("display_name", key.capitalize())
 
 
 def _tech_devicon(key):
     """Retorna a classe CSS do Devicon para a tecnologia, ou fallback se não houver ícone."""
-    devicon_map = {
-        "python": "devicon-python-plain",
-        "django": "devicon-django-plain",
-        "fastapi": "devicon-fastapi-plain",
-        "react": "devicon-react-original",
-        "next.js": "devicon-nextjs-plain",
-        "node": "devicon-nodejs-plain",
-        "typescript": "devicon-typescript-plain",
-        "docker": "devicon-docker-plain",
-        "postgresql": "devicon-postgresql-plain",
-        "redis": "devicon-redis-plain",
-        "tailwind": "devicon-tailwindcss-original",
-        "flutter": "devicon-flutter-plain",
-        "go": "devicon-go-plain",
-        "rust": "devicon-rust-original",
-        "vue": "devicon-vuejs-plain",
-        "svelte": "devicon-svelte-plain",
-        "spring": "devicon-spring-original",
-        "springboot": "devicon-spring-original",
-        "kotlin": "devicon-kotlin-plain",
-        "rails": "devicon-rails-plain",
-        "laravel": "devicon-laravel-original",
-        "javascript": "devicon-javascript-plain",
-        "php": "devicon-php-plain",
-        "java": "devicon-java-plain",
-        "mysql": "devicon-mysql-original",
-        "mongodb": "devicon-mongodb-plain",
-        "html": "devicon-html5-plain",
-        "css": "devicon-css3-plain",
-        "scss": "devicon-sass-original",
-        "sass": "devicon-sass-original",
-    }
-    return devicon_map.get(key, "devicon-love2d-plain")
+    return _TECH_DATA.get(key, {}).get("devicon", "devicon-love2d-plain")
 
 
 def index(request):
