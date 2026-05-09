@@ -1,73 +1,13 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}AGENTS.md Gerado{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.0/styles/atom-one-dark.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="{% static 'css/result.css' %}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.0/highlight.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2.9.0/dist/highlightjs-line-numbers.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){hljs.highlightAll();hljs.lineNumbersBlock(document.getElementById('agents-content'))});</script>
-<style>
-  pre code.hljs table.hljs-ln {
-    border-collapse: collapse;
-    width: 100%;
-  }
-  pre code.hljs table.hljs-ln tr {
-    background: transparent !important;
-  }
-  pre code.hljs td.hljs-ln-numbers {
-    text-align: right;
-    color: #6e7681;
-    border-right: 1px solid #30363d;
-    vertical-align: top;
-    padding: 0 10px;
-    user-select: none;
-    width: 1%;
-    min-width: 44px;
-    font-size: 12px;
-    line-height: 1.6;
-    white-space: nowrap;
-  }
-  pre code.hljs td.hljs-ln-code {
-    padding-left: 12px;
-  }
-  pre code.hljs .hljs-ln-n {
-    font-size: 12px;
-    line-height: 1.6;
-  }
-  @media (max-width: 500px) {
-    .sidebar-drawer {
-      position: fixed;
-      top: 3.5rem;
-      right: 0;
-      bottom: 0;
-      width: 16rem;
-      z-index: 40;
-      background-color: var(--bg-card);
-      border-left: 1px solid var(--border);
-      box-shadow: -4px 0 12px rgba(0,0,0,0.1);
-      transform: translateX(100%);
-      transition: transform 0.3s ease-in-out;
-    }
-    .sidebar-drawer.open {
-      transform: translateX(0);
-    }
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 35;
-    }
-    .sidebar-overlay.open {
-      display: block;
-    }
-    .sidebar-toggle-mobile { display: inline-flex; }
-  }
-  @media (min-width: 501px) {
-    .sidebar-toggle-mobile { display: none; }
-  }
-  .tech-icon { font-size: 14px; }
-</style>
 {% endblock %}
 
 {% block content %}

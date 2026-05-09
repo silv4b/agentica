@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="pt-BR" data-theme="light">
   <head>
@@ -7,106 +8,11 @@
       {% block title %}Agentica - Gerador de AGENTS.md{% endblock %}
     </title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
-    <style>
-      :root {
-        --bg: #ffffff;
-        --bg-nav: #ffffff;
-        --bg-card: #ffffff;
-        --bg-subtle: #f9fafb;
-        --bg-hover: #f3f4f6;
-        --bg-input: #ffffff;
-        --text-primary: #111827;
-        --text-secondary: #4b5563;
-        --text-muted: #9ca3af;
-        --border: #e5e7eb;
-        --border-hover: #9ca3af;
-      }
-      [data-theme="dark"] {
-        --bg: #0d1117;
-        --bg-nav: #161b22;
-        --bg-card: #161b22;
-        --bg-subtle: #161b22;
-        --bg-hover: #1c2128;
-        --bg-input: #0d1117;
-        --text-primary: #e6edf3;
-        --text-secondary: #8b949e;
-        --text-muted: #6e7681;
-        --border: #30363d;
-        --border-hover: #8b949e;
-      }
-      body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica,
-          Arial, sans-serif;
-        background-color: var(--bg);
-        color: var(--text-primary);
-      }
-      pre {
-        font-size: 13px !important;
-        line-height: 1.45;
-        background: #282c34 !important;
-        overflow-x: auto;
-        max-width: 100%;
-      }
-      code {
-        font-size: 13px;
-      }
-      .hljs {
-        background: #282c34 !important;
-        color: #abb2bf;
-        word-wrap: normal;
-        white-space: pre;
-      }
-      .hljs-comment {
-        color: #6f8098;
-      }
-      .hljs-string {
-        color: #98c379;
-      }
-      .hljs-keyword {
-        color: #c678dd;
-      }
-      .hljs-built_in {
-        color: #e6c07b;
-      }
-      .hljs-name {
-        color: #e06c75;
-      }
-      .bg-theme {
-        background-color: var(--bg);
-      }
-      .bg-nav {
-        background-color: var(--bg-nav);
-      }
-      .bg-card {
-        background-color: var(--bg-card);
-      }
-      .bg-subtle {
-        background-color: var(--bg-subtle);
-      }
-      .bg-hover:hover {
-        background-color: var(--bg-hover);
-      }
-      .bg-input {
-        background-color: var(--bg-input);
-      }
-      .text-primary {
-        color: var(--text-primary);
-      }
-      .text-secondary {
-        color: var(--text-secondary);
-      }
-      .text-muted {
-        color: var(--text-muted);
-      }
-      .border-theme {
-        border-color: var(--border);
-      }
-      .border-hover:hover {
-        border-color: var(--border-hover);
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block extra_head %}{% endblock %}
   </head>
   <body>

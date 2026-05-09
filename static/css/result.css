@@ -1,0 +1,31 @@
+pre code.hljs table.hljs-ln {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+pre code.hljs table.hljs-ln tr {
+  background: transparent !important;
+}
+
+pre code.hljs td.hljs-ln-numbers {
+  text-align: right;
+  color: #6e7681;
+  border-right: 1px solid #30363d;
+  vertical-align: top;
+  padding: 0 10px;
+  user-select: none;
+  width: 1%;
+  min-width: 44px;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+pre code.hljs td.hljs-ln-code {
+  padding-left: 12px;
+}
+
+pre code.hljs .hljs-ln-n {
+  font-size: 12px;
+  line-height: 1.6;
+}
