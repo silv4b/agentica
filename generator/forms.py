@@ -1,6 +1,5 @@
 from django import forms
 
-
 LANG_CHOICES = [
     ("pt", "Português"),
     ("en", "English"),
@@ -8,6 +7,8 @@ LANG_CHOICES = [
 
 
 class TechForm(forms.Form):
+    """Formulário para entrada de tecnologias e idioma pelo usuário."""
+
     technologies = forms.CharField(
         label="Tecnologias",
         widget=forms.HiddenInput(),

@@ -20,10 +20,11 @@ These recommendations apply to any project regardless of technology stack.
 
 ## Testing
 
-- Write tests alongside features (TDD when possible)
+- Write tests alongside features
 - Aim for meaningful coverage, not 100% for its own sake
 - Test behavior, not implementation details
 - Use realistic fixtures and avoid mocks when integration tests suffice
+- Write docstrings in Portuguese for all tests explaining the scenario being tested
 
 ## Security
 
@@ -159,7 +160,9 @@ These recommendations apply to any project regardless of technology stack.
 ## Commands
 
 - Install deps: `uv add <package>`
+- Install dev deps: `uv add --dev <package>`
 - Remove dep: `uv remove <package>`
+- Remove dev dep: `uv remove --dev <package>`
 - Run: `uv run <command>`
 - Sync env: `uv sync`
 - Build: `uv build`

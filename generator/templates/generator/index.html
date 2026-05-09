@@ -74,6 +74,8 @@
   @media (min-width: 501px) {
     .sidebar-toggle-mobile { display: none; }
   }
+  .tech-icon { font-size: 14px; }
+  .tech-icon-sm { font-size: 12px; }
 </style>
 {% endblock %}
 
@@ -155,8 +157,8 @@
                             {% endif %}
                         </p>
                         <div class="flex flex-wrap gap-1.5">
-                            {% for tech in supported_techs %}
-                                <span class="px-2 py-0.5 text-xs border border-theme rounded hover:border-hover cursor-pointer text-secondary bg-hover tech-badge" data-tech="{{ tech }}">{{ tech }}</span>
+                            {% for item in supported_with_icons %}
+                                <span class="px-2 py-0.5 text-xs border border-theme rounded hover:border-hover cursor-pointer text-secondary bg-hover tech-badge" data-tech="{{ item.key }}"><i class="{{ item.icon }} tech-icon"></i> {{ item.key }}</span>
                             {% endfor %}
                         </div>
                     </div>
@@ -185,9 +187,9 @@
                 >
             </div>
             <div id="tech-list" class="space-y-1">
-                {% for tech in supported_techs %}
-                    <div class="tech-item text-xs text-secondary hover:text-primary cursor-pointer tech-badge px-2 py-1 rounded bg-hover" data-tech="{{ tech }}">
-                        {{ tech }}
+                {% for item in supported_with_icons %}
+                    <div class="tech-item text-xs text-secondary hover:text-primary cursor-pointer tech-badge px-2 py-1 rounded bg-hover flex items-center gap-1.5" data-tech="{{ item.key }}">
+                        <i class="{{ item.icon }} tech-icon"></i> {{ item.key }}
                     </div>
                 {% endfor %}
             </div>
@@ -201,6 +203,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const knownTechs = {{ tech_json|safe }};
+    const techIcons = {{ tech_icons_json|safe }};
 
     const tagInput = document.getElementById('tag-input');
     const tagContainer = document.getElementById('tag-container');
@@ -269,7 +272,8 @@ document.addEventListener('DOMContentLoaded', function() {
             div.className = 'dropdown-item' + (idx === activeIndex ? ' active' : '');
             div.dataset.index = idx;
             div.dataset.value = item;
-            div.innerHTML = highlightMatch(item, tagInput.value.trim()) + '<span class="tech-category">tecnologia</span>';
+            const icon = techIcons[item] || '';
+            div.innerHTML = (icon ? '<i class="' + icon + ' tech-icon-sm"></i> ' : '') + highlightMatch(item, tagInput.value.trim()) + '<span class="tech-category">tecnologia</span>';
             div.addEventListener('click', function() {
                 if (addTag(item)) {
                     tagInput.focus();

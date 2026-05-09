@@ -4,8 +4,70 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "deep-translator>=1.11.4",
-    "django>=6.0.5",
+dependencies = ["deep-translator>=1.11.4", "django>=6.0.5", "ruff>=0.15.12"]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.13.5",
+    "poethepoet>=0.45.0",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "pytest-django>=4.12.0",
 ]
 
+[tool.poe.tasks]
+# django commands
+runserver = "uv run python manage.py runserver"
+migrate = "uv run python manage.py migrate"
+makemigrations = "uv run python manage.py makemigrations"
+migrations = [{ ref = "makemigrations" }, { ref = "migrate" }]
+showmigrations = "uv run python manage.py showmigrations"
+createsuperuser = "uv run python manage.py createsuperuser"
+startapp = "uv run python manage.py startapp"
+collectstatic = "uv run python manage.py collectstatic"
+
+# coverage commands
+test = "uv run python manage.py test"
+cov-run = "uv run coverage run manage.py test"
+cov-report = "uv run coverage report"
+cov-html = "uv run coverage html"
+
+[tool.poe.tasks.coverage]
+sequence = ["cov-run", "cov-report", "cov-html"]
+
+# coverage run configs
+[tool.coverage.run]
+source = ["generator", "agentica"]
+omit = [
+    "*/__pycache__/*",
+    "*/migrations/*",
+    "*main.py",
+    "*__init__.py",
+    "*asgi.py",
+    "*wsgi.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+# Ignorar linhas vazias/comentários no cálculo
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise NotImplementedError",
+]
+fail_under = 90 # Falha se a cobertura total for menor que 90%
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "agentica.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+testpaths = ["."]
+norecursedirs = [".venv", "env", "node_modules"]

@@ -1,11 +1,12 @@
 import json
-import urllib.request
 import urllib.error
+import urllib.request
 from pathlib import Path
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+
 from .forms import TechForm
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -212,6 +213,8 @@ _translation_cache = {}
 
 
 def _load_md(filename, lang="pt"):
+    """Carrega o conteúdo de um arquivo Markdown, com fallback e tradução automática via Google Translator."""
+
     path_lang = TEMPLATES_DIR / f"{filename}.{lang}.md"
     if path_lang.exists():
         return path_lang.read_text(encoding="utf-8")
@@ -242,10 +245,12 @@ def _load_md(filename, lang="pt"):
 
 
 def _normalize_tech(name):
+    """Normaliza um nome de tecnologia removendo espaços, pontos e cerquilhas."""
     return name.strip().lower().replace(".", "").replace("#", "")
 
 
 def _match_tech(raw_name):
+    """Tenta corresponder um nome bruto a uma chave válida em TECH_CONFIG."""
     normalized = _normalize_tech(raw_name)
     for key in TECH_CONFIG:
         if normalized == key or normalized == key.replace(".", "").replace("#", ""):
@@ -254,10 +259,17 @@ def _match_tech(raw_name):
 
 
 def _parse_technologies(raw):
-    return [t.strip() for t in raw.split(",") if t.strip()]
+    """Converte uma string separada por vírgulas em uma lista de tecnologias."""
+    result = []
+    for t in raw.split(","):
+        t = t.strip()
+        if t:
+            result.append(t)
+    return result
 
 
 def _pick(items, prefer_keyword):
+    """Remove duplicatas mantendo a ordem e prioriza o item preferido no topo."""
     seen = set()
     result = []
     for item in items:
@@ -269,7 +281,8 @@ def _pick(items, prefer_keyword):
     return result
 
 
-def _tech_display_name(key):
+def _tech_display_name(key: str) -> str:
+    """Retorna o nome de exibição amigável de uma tecnologia a partir de sua chave."""
     overrides = {
         "next.js": "Next.js",
         "javascript": "JavaScript",
@@ -307,21 +320,68 @@ def _tech_display_name(key):
     return overrides.get(key, key.capitalize())
 
 
+def _tech_devicon(key):
+    """Retorna a classe CSS do Devicon para a tecnologia, ou fallback se não houver ícone."""
+    devicon_map = {
+        "python": "devicon-python-plain",
+        "django": "devicon-django-plain",
+        "fastapi": "devicon-fastapi-plain",
+        "react": "devicon-react-original",
+        "next.js": "devicon-nextjs-plain",
+        "node": "devicon-nodejs-plain",
+        "typescript": "devicon-typescript-plain",
+        "docker": "devicon-docker-plain",
+        "postgresql": "devicon-postgresql-plain",
+        "redis": "devicon-redis-plain",
+        "tailwind": "devicon-tailwindcss-original",
+        "flutter": "devicon-flutter-plain",
+        "go": "devicon-go-plain",
+        "rust": "devicon-rust-original",
+        "vue": "devicon-vuejs-plain",
+        "svelte": "devicon-svelte-plain",
+        "spring": "devicon-spring-original",
+        "springboot": "devicon-spring-original",
+        "kotlin": "devicon-kotlin-plain",
+        "rails": "devicon-rails-plain",
+        "laravel": "devicon-laravel-original",
+        "javascript": "devicon-javascript-plain",
+        "php": "devicon-php-plain",
+        "java": "devicon-java-plain",
+        "mysql": "devicon-mysql-original",
+        "mongodb": "devicon-mongodb-plain",
+        "html": "devicon-html5-plain",
+        "css": "devicon-css3-plain",
+        "scss": "devicon-sass-original",
+        "sass": "devicon-sass-original",
+    }
+    return devicon_map.get(key, "devicon-love2d-plain")
+
+
 def index(request):
+    """Exibe a página inicial com o formulário de seleção de tecnologias."""
     form = TechForm()
     supported_techs = sorted(TECH_CONFIG.keys())
+    tech_icons = {}
+    for key in TECH_CONFIG:
+        tech_icons[key] = _tech_devicon(key)
+    supported_with_icons = []
+    for t in supported_techs:
+        supported_with_icons.append({"key": t, "icon": tech_icons[t]})
     return render(
         request,
         "generator/index.html",
         {
             "form": form,
             "supported_techs": supported_techs,
+            "supported_with_icons": supported_with_icons,
             "tech_json": json.dumps(supported_techs),
+            "tech_icons_json": json.dumps(tech_icons),
         },
     )
 
 
 def result(request):
+    """Processa o formulário POST e renderiza a página com o AGENTS.md gerado."""
     if request.method != "POST":
         form = TechForm()
         return render(request, "generator/index.html", {"form": form})
@@ -332,9 +392,14 @@ def result(request):
 
     lang = form.cleaned_data.get("language", "pt")
 
-    agents_content, tech_list, matched, unmatched = _build_content(
-        form.cleaned_data["technologies"], lang=lang
-    )
+    agents_content, tech_list, matched, unmatched = _build_content(form.cleaned_data["technologies"], lang=lang)
+
+    tech_icons = {}
+    for key in TECH_CONFIG:
+        tech_icons[key] = _tech_devicon(key)
+    matched_with_icons = []
+    for t in matched:
+        matched_with_icons.append({"key": t, "icon": tech_icons[t]})
 
     return render(
         request,
@@ -344,32 +409,33 @@ def result(request):
             "tech_list": tech_list,
             "unmatched": unmatched,
             "matched": matched,
+            "matched_with_icons": matched_with_icons,
             "lang": lang,
         },
     )
 
 
 def download(request):
+    """Gera e força o download do arquivo AGENTS.md como attachment."""
     if request.method != "POST":
         return HttpResponse(status=405)
 
     form = TechForm(request.POST)
     if not form.is_valid():
-        return HttpResponse("Invalid form", status=400)
+        return HttpResponse(b"Invalid form", status=400)
 
     lang = form.cleaned_data.get("language", "pt")
-    agents_content, tech_list, _, _ = _build_content(
-        form.cleaned_data["technologies"], lang=lang
-    )
+    agents_content, tech_list, _, _ = _build_content(form.cleaned_data["technologies"], lang=lang)
 
     filename = "AGENTS.md"
-    response = HttpResponse(agents_content, content_type="text/markdown; charset=utf-8")
+    response = HttpResponse(agents_content.encode("utf-8"), content_type="text/markdown; charset=utf-8")
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response
 
 
 @csrf_exempt
 def create_gist(request):
+    """Cria um Gist privado no GitHub com o conteúdo gerado, usando o token fornecido."""
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
@@ -431,6 +497,7 @@ def create_gist(request):
 
 
 def _build_content(raw_techs, lang="pt"):
+    """Monta o conteúdo completo do AGENTS.md combinando os templates das tecnologias selecionadas."""
     tech_names = _parse_technologies(raw_techs)
 
     matched = []
@@ -456,10 +523,14 @@ def _build_content(raw_techs, lang="pt"):
             parts.append(content)
 
     if matched:
-        tech_list = ", ".join(_tech_display_name(t) for t in matched)
+        tech_names = []
+        for t in matched:
+            tech_names.append(_tech_display_name(t))
+        tech_list = ", ".join(tech_names)
     else:
         tech_list = ", ".join(unmatched) if unmatched else "Nenhuma"
 
-    agents_content = "\n\n---\n\n".join(parts)
+    agents_content = "\n---\n\n".join(parts)
+    agents_content += "\n<!-- Feito com Agentica -->" if lang == "pt" else "\n<!-- Build with Agentica -->"
 
     return agents_content, tech_list, matched, unmatched

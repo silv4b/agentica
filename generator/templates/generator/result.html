@@ -66,6 +66,7 @@
   @media (min-width: 501px) {
     .sidebar-toggle-mobile { display: none; }
   }
+  .tech-icon { font-size: 14px; }
 </style>
 {% endblock %}
 
@@ -159,8 +160,8 @@
                 {% endif %}
             </p>
             <div class="flex flex-wrap gap-1.5">
-                {% for tech in matched %}
-                    <span class="px-2 py-0.5 text-xs border border-theme rounded text-secondary">{{ tech }}</span>
+                {% for item in matched_with_icons %}
+                    <span class="px-2 py-0.5 text-xs border border-theme rounded text-secondary flex items-center gap-1"><i class="{{ item.icon }} tech-icon"></i> {{ item.key }}</span>
                 {% endfor %}
             </div>
             <div class="mt-6 pt-4 border-t border-theme">
