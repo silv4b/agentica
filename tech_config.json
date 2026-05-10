@@ -5,7 +5,8 @@
     "lint": "ng lint",
     "style": "",
     "display_name": "Angular",
-    "devicon": "devicon-angular-plain"
+    "devicon": "devicon-angular-plain",
+    "version_source": "npm:@angular/core"
   },
   "aspnetcore": {
     "run": "dotnet run",
@@ -13,7 +14,8 @@
     "lint": "dotnet format",
     "style": "",
     "display_name": "ASP.NET Core",
-    "devicon": "devicon-dotnetcore-plain"
+    "devicon": "devicon-dotnetcore-plain",
+    "version_source": "github:dotnet/aspnetcore"
   },
   "astro": {
     "run": "npm run dev",
@@ -21,7 +23,8 @@
     "lint": "",
     "style": "",
     "display_name": "Astro",
-    "devicon": "devicon-astro-plain"
+    "devicon": "devicon-astro-plain",
+    "version_source": "npm:astro"
   },
   "bash": {
     "run": "",
@@ -29,7 +32,8 @@
     "lint": "",
     "style": "",
     "display_name": "Bash",
-    "devicon": "devicon-bash-plain"
+    "devicon": "devicon-bash-plain",
+    "version_source": ""
   },
   "blazor": {
     "run": "dotnet run",
@@ -37,7 +41,8 @@
     "lint": "dotnet format",
     "style": "",
     "display_name": "Blazor",
-    "devicon": "devicon-love2d-plain"
+    "devicon": "devicon-love2d-plain",
+    "version_source": "github:dotnet/aspnetcore"
   },
   "cplusplus": {
     "run": "",
@@ -45,7 +50,8 @@
     "lint": "",
     "style": "",
     "display_name": "C++",
-    "devicon": "devicon-cplusplus-plain"
+    "devicon": "devicon-cplusplus-plain",
+    "version_source": ""
   },
   "csharp": {
     "run": "",
@@ -53,7 +59,8 @@
     "lint": "",
     "style": "",
     "display_name": "C#",
-    "devicon": "devicon-csharp-plain"
+    "devicon": "devicon-csharp-plain",
+    "version_source": "github:dotnet/roslyn"
   },
   "css": {
     "run": "",
@@ -61,7 +68,8 @@
     "lint": "",
     "style": "",
     "display_name": "CSS",
-    "devicon": "devicon-css3-plain"
+    "devicon": "devicon-css3-plain",
+    "version_source": ""
   },
   "daisyui": {
     "run": "",
@@ -69,7 +77,8 @@
     "lint": "",
     "style": "",
     "display_name": "DaisyUI",
-    "devicon": "devicon-love2d-plain"
+    "devicon": "devicon-love2d-plain",
+    "version_source": "npm:daisyui"
   },
   "dart": {
     "run": "dart run",
@@ -77,7 +86,8 @@
     "lint": "dart analyze",
     "style": "",
     "display_name": "Dart",
-    "devicon": "devicon-dart-plain"
+    "devicon": "devicon-dart-plain",
+    "version_source": "github:dart-lang/sdk"
   },
   "django": {
     "run": "python manage.py runserver",
@@ -85,7 +95,8 @@
     "lint": "ruff check .",
     "style": "",
     "display_name": "Django",
-    "devicon": "devicon-django-plain"
+    "devicon": "devicon-django-plain",
+    "version_source": "pypi:django"
   },
   "docker": {
     "run": "docker compose up",
@@ -93,7 +104,8 @@
     "lint": "",
     "style": "",
     "display_name": "Docker",
-    "devicon": "devicon-docker-plain"
+    "devicon": "devicon-docker-plain",
+    "version_source": "github:moby/moby"
   },
   "elasticsearch": {
     "run": "",
@@ -101,7 +113,8 @@
     "lint": "",
     "style": "",
     "display_name": "Elasticsearch",
-    "devicon": "devicon-elasticsearch-plain"
+    "devicon": "devicon-elasticsearch-plain",
+    "version_source": "github:elastic/elasticsearch"
   },
   "express": {
     "run": "npm run dev",
@@ -109,7 +122,8 @@
     "lint": "",
     "style": "",
     "display_name": "Express",
-    "devicon": "devicon-express-original"
+    "devicon": "devicon-express-original",
+    "version_source": "npm:express"
   },
   "fastapi": {
     "run": "uvicorn app.main:app --reload",
@@ -117,7 +131,8 @@
     "lint": "ruff check .",
     "style": "",
     "display_name": "FastAPI",
-    "devicon": "devicon-fastapi-plain"
+    "devicon": "devicon-fastapi-plain",
+    "version_source": "pypi:fastapi"
   },
   "flask": {
     "run": "flask run",
@@ -125,7 +140,8 @@
     "lint": "ruff check .",
     "style": "",
     "display_name": "Flask",
-    "devicon": "devicon-flask-original"
+    "devicon": "devicon-flask-original",
+    "version_source": "pypi:flask"
   },
   "flutter": {
     "run": "flutter run",
@@ -133,7 +149,8 @@
     "lint": "flutter analyze",
     "style": "",
     "display_name": "Flutter",
-    "devicon": "devicon-flutter-plain"
+    "devicon": "devicon-flutter-plain",
+    "version_source": "github:flutter/flutter"
   },
   "go": {
     "run": "go run .",
@@ -141,7 +158,8 @@
     "lint": "golangci-lint run",
     "style": "",
     "display_name": "Go",
-    "devicon": "devicon-go-plain"
+    "devicon": "devicon-go-plain",
+    "version_source": "github:golang/go"
   },
   "html": {
     "run": "",
@@ -149,7 +167,8 @@
     "lint": "",
     "style": "",
     "display_name": "HTML",
-    "devicon": "devicon-html5-plain"
+    "devicon": "devicon-html5-plain",
+    "version_source": ""
   },
   "java": {
     "run": "",
@@ -157,7 +176,8 @@
     "lint": "",
     "style": "",
     "display_name": "Java",
-    "devicon": "devicon-java-plain"
+    "devicon": "devicon-java-plain",
+    "version_source": "github:openjdk/jdk"
   },
   "javascript": {
     "run": "",
@@ -165,7 +185,8 @@
     "lint": "",
     "style": "",
     "display_name": "JavaScript",
-    "devicon": "devicon-javascript-plain"
+    "devicon": "devicon-javascript-plain",
+    "version_source": ""
   },
   "jest": {
     "run": "",
@@ -173,7 +194,8 @@
     "lint": "",
     "style": "",
     "display_name": "Jest",
-    "devicon": "devicon-jest-plain"
+    "devicon": "devicon-jest-plain",
+    "version_source": "npm:jest"
   },
   "jquery": {
     "run": "",
@@ -181,7 +203,8 @@
     "lint": "",
     "style": "",
     "display_name": "jQuery",
-    "devicon": "devicon-jquery-plain"
+    "devicon": "devicon-jquery-plain",
+    "version_source": "npm:jquery"
   },
   "kotlin": {
     "run": "./gradlew run",
@@ -189,7 +212,8 @@
     "lint": "./gradlew ktlintCheck",
     "style": "",
     "display_name": "Kotlin",
-    "devicon": "devicon-kotlin-plain"
+    "devicon": "devicon-kotlin-plain",
+    "version_source": "github:JetBrains/kotlin"
   },
   "laravel": {
     "run": "php artisan serve",
@@ -197,7 +221,8 @@
     "lint": "./vendor/bin/pint",
     "style": "",
     "display_name": "Laravel",
-    "devicon": "devicon-laravel-original"
+    "devicon": "devicon-laravel-original",
+    "version_source": "github:laravel/laravel"
   },
   "mariadb": {
     "run": "",
@@ -205,7 +230,8 @@
     "lint": "",
     "style": "",
     "display_name": "MariaDB",
-    "devicon": "devicon-mariadb-original"
+    "devicon": "devicon-mariadb-original",
+    "version_source": "github:mariadb/server"
   },
   "mongodb": {
     "run": "",
@@ -213,7 +239,8 @@
     "lint": "",
     "style": "",
     "display_name": "MongoDB",
-    "devicon": "devicon-mongodb-plain"
+    "devicon": "devicon-mongodb-plain",
+    "version_source": "github:mongodb/mongo"
   },
   "mysql": {
     "run": "",
@@ -221,7 +248,8 @@
     "lint": "",
     "style": "",
     "display_name": "MySQL",
-    "devicon": "devicon-mysql-original"
+    "devicon": "devicon-mysql-original",
+    "version_source": "github:mysql/mysql-server"
   },
   "nestjs": {
     "run": "npm run start:dev",
@@ -229,7 +257,8 @@
     "lint": "npm run lint",
     "style": "",
     "display_name": "NestJS",
-    "devicon": "devicon-nestjs-plain"
+    "devicon": "devicon-nestjs-plain",
+    "version_source": "npm:@nestjs/core"
   },
   "next.js": {
     "run": "npm run dev",
@@ -237,7 +266,8 @@
     "lint": "npm run lint",
     "style": "",
     "display_name": "Next.js",
-    "devicon": "devicon-nextjs-plain"
+    "devicon": "devicon-nextjs-plain",
+    "version_source": "npm:next"
   },
   "node": {
     "run": "npm run dev",
@@ -245,7 +275,8 @@
     "lint": "npm run lint",
     "style": "",
     "display_name": "Node.js",
-    "devicon": "devicon-nodejs-plain"
+    "devicon": "devicon-nodejs-plain",
+    "version_source": "github:nodejs/node"
   },
   "nuxt.js": {
     "run": "npm run dev",
@@ -253,7 +284,8 @@
     "lint": "",
     "style": "",
     "display_name": "Nuxt.js",
-    "devicon": "devicon-nuxtjs-plain"
+    "devicon": "devicon-nuxtjs-plain",
+    "version_source": "npm:nuxt"
   },
   "php": {
     "run": "",
@@ -261,7 +293,8 @@
     "lint": "",
     "style": "",
     "display_name": "PHP",
-    "devicon": "devicon-php-plain"
+    "devicon": "devicon-php-plain",
+    "version_source": "github:php/php-src"
   },
   "playwright": {
     "run": "",
@@ -269,7 +302,8 @@
     "lint": "",
     "style": "",
     "display_name": "Playwright",
-    "devicon": "devicon-love2d-plain"
+    "devicon": "devicon-love2d-plain",
+    "version_source": "npm:@playwright/test"
   },
   "postgresql": {
     "run": "",
@@ -277,7 +311,8 @@
     "lint": "",
     "style": "",
     "display_name": "PostgreSQL",
-    "devicon": "devicon-postgresql-plain"
+    "devicon": "devicon-postgresql-plain",
+    "version_source": "github:postgres/postgres"
   },
   "python": {
     "run": "python manage.py runserver",
@@ -285,7 +320,8 @@
     "lint": "ruff check .",
     "style": "",
     "display_name": "Python",
-    "devicon": "devicon-python-plain"
+    "devicon": "devicon-python-plain",
+    "version_source": "github:python/cpython"
   },
   "rails": {
     "run": "bin/rails server",
@@ -293,7 +329,8 @@
     "lint": "rubocop",
     "style": "",
     "display_name": "Ruby on Rails",
-    "devicon": "devicon-rails-plain"
+    "devicon": "devicon-rails-plain",
+    "version_source": "rubygems:rails"
   },
   "react": {
     "run": "npm run dev",
@@ -301,7 +338,8 @@
     "lint": "npm run lint",
     "style": "",
     "display_name": "React",
-    "devicon": "devicon-react-original"
+    "devicon": "devicon-react-original",
+    "version_source": "npm:react"
   },
   "redis": {
     "run": "",
@@ -309,7 +347,8 @@
     "lint": "",
     "style": "",
     "display_name": "Redis",
-    "devicon": "devicon-redis-plain"
+    "devicon": "devicon-redis-plain",
+    "version_source": "github:redis/redis"
   },
   "ruby": {
     "run": "ruby script.rb",
@@ -317,7 +356,8 @@
     "lint": "rubocop",
     "style": "",
     "display_name": "Ruby",
-    "devicon": "devicon-ruby-plain"
+    "devicon": "devicon-ruby-plain",
+    "version_source": "github:ruby/ruby"
   },
   "rust": {
     "run": "cargo run",
@@ -325,7 +365,8 @@
     "lint": "cargo clippy",
     "style": "",
     "display_name": "Rust",
-    "devicon": "devicon-rust-original"
+    "devicon": "devicon-rust-original",
+    "version_source": "github:rust-lang/rust"
   },
   "sass": {
     "run": "",
@@ -333,7 +374,8 @@
     "lint": "",
     "style": "",
     "display_name": "Sass",
-    "devicon": "devicon-sass-original"
+    "devicon": "devicon-sass-original",
+    "version_source": "npm:sass"
   },
   "scss": {
     "run": "",
@@ -341,7 +383,8 @@
     "lint": "",
     "style": "",
     "display_name": "SCSS",
-    "devicon": "devicon-sass-original"
+    "devicon": "devicon-sass-original",
+    "version_source": "npm:sass"
   },
   "spring": {
     "run": "./mvnw spring-boot:run",
@@ -349,7 +392,8 @@
     "lint": "./mvnw checkstyle:check",
     "style": "",
     "display_name": "Spring",
-    "devicon": "devicon-spring-original"
+    "devicon": "devicon-spring-original",
+    "version_source": "github:spring-projects/spring-framework"
   },
   "springboot": {
     "run": "./mvnw spring-boot:run",
@@ -357,7 +401,8 @@
     "lint": "",
     "style": "",
     "display_name": "Spring Boot",
-    "devicon": "devicon-spring-original"
+    "devicon": "devicon-spring-original",
+    "version_source": "github:spring-projects/spring-boot"
   },
   "sqlite": {
     "run": "",
@@ -365,7 +410,8 @@
     "lint": "",
     "style": "",
     "display_name": "SQLite",
-    "devicon": "devicon-sqlite-plain"
+    "devicon": "devicon-sqlite-plain",
+    "version_source": ""
   },
   "svelte": {
     "run": "npm run dev",
@@ -373,7 +419,8 @@
     "lint": "npm run lint",
     "style": "",
     "display_name": "Svelte",
-    "devicon": "devicon-svelte-plain"
+    "devicon": "devicon-svelte-plain",
+    "version_source": "npm:svelte"
   },
   "swift": {
     "run": "swift run",
@@ -381,7 +428,8 @@
     "lint": "",
     "style": "",
     "display_name": "Swift",
-    "devicon": "devicon-swift-plain"
+    "devicon": "devicon-swift-plain",
+    "version_source": "github:swiftlang/swift"
   },
   "tailwind": {
     "run": "",
@@ -389,7 +437,8 @@
     "lint": "",
     "style": "",
     "display_name": "Tailwind CSS",
-    "devicon": "devicon-tailwindcss-original"
+    "devicon": "devicon-tailwindcss-original",
+    "version_source": "npm:tailwindcss"
   },
   "typescript": {
     "run": "npm run dev",
@@ -397,7 +446,8 @@
     "lint": "npx tsc --noEmit",
     "style": "",
     "display_name": "TypeScript",
-    "devicon": "devicon-typescript-plain"
+    "devicon": "devicon-typescript-plain",
+    "version_source": "npm:typescript"
   },
   "uv": {
     "run": "",
@@ -405,7 +455,8 @@
     "lint": "",
     "style": "",
     "display_name": "UV",
-    "devicon": "devicon-love2d-plain"
+    "devicon": "devicon-love2d-plain",
+    "version_source": "pypi:uv"
   },
   "vite": {
     "run": "npm run dev",
@@ -413,7 +464,8 @@
     "lint": "",
     "style": "",
     "display_name": "Vite",
-    "devicon": "devicon-vitejs-plain"
+    "devicon": "devicon-vitejs-plain",
+    "version_source": "npm:vite"
   },
   "vitest": {
     "run": "",
@@ -421,7 +473,8 @@
     "lint": "",
     "style": "",
     "display_name": "Vitest",
-    "devicon": "devicon-love2d-plain"
+    "devicon": "devicon-love2d-plain",
+    "version_source": "npm:vitest"
   },
   "vue": {
     "run": "npm run dev",
@@ -429,6 +482,7 @@
     "lint": "npm run lint",
     "style": "",
     "display_name": "Vue.js",
-    "devicon": "devicon-vuejs-plain"
+    "devicon": "devicon-vuejs-plain",
+    "version_source": "npm:vue"
   }
 }

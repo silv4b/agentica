@@ -1,15 +1,18 @@
 <!-- markdownlint-disable MD060 MD040 -->
 # Agentica Maker
 
-O Agentica é um gerador arquivos `AGENTS.md` base para seus projetos, com instruções personalizadas que ensinam agentes de IA a trabalhar com sua stack.
+Gera arquivos `AGENTS.md` com instruções personalizadas para ensinar agentes de IA a trabalhar com sua stack tecnológica.
 
 ## Funcionalidades
 
-- **Seleção de tecnologias** — Autocomplete com ~30 tecnologias suportadas (Python, Django, React, Docker, etc.)
-- **Idioma** — O conteúdo é gerado em português
-- **Copiar / Download** — Copie o resultado para a área de transferência ou baixe como `AGENTS.md`
-- **GitHub Gist** — Crie um gist privado diretamente pela interface com seu token do GitHub
-- **Highlight de sintaxe** — Código destacado com highlight.js + numeração de linhas
+- **Seleção de tecnologias** — Autocomplete com 54 tecnologias suportadas
+- **Idioma** — Geração em inglês (recomendado para melhor performance de agentes de IA)
+- **Versões automáticas** — Detecta a versão mais recente de cada tecnologia (PyPI, npm, GitHub, RubyGems, Cargo)
+- **Code Examples** — Exemplos de código bom/ruim para cada tecnologia
+- **Boundaries** — Regras do que fazer/perguntar/nunca fazer para cada tecnologia
+- **Copiar / Download** — Copie o resultado ou baixe como `AGENTS.md`
+- **GitHub Gist** — Crie um gist privado diretamente pela interface
+- **Modo edição** — Visualize e edite o conteúdo gerado antes de salvar
 
 ## Stack
 
@@ -17,22 +20,18 @@ O Agentica é um gerador arquivos `AGENTS.md` base para seus projetos, com instr
 |---|---|
 | **Django 6.0+** | Framework web |
 | **Python 3.12+** | Linguagem |
-
 | **Tailwind CSS** (CDN) | Estilização |
 | **highlight.js** | Syntax highlight no resultado |
-| **SQLite** | Banco (apenas para admin do Django) |
+| **SQLite** | Banco de dados |
 
 ## Começando
 
 ```bash
-# Clonar
 git clone https://github.com/silv4b/agentica
 cd agentica
 
-# Sincronizar dependências (usa UV)
 uv sync
-
-# Rodar
+uv run python manage.py migrate
 uv run python manage.py runserver
 ```
 
@@ -42,19 +41,26 @@ Acesse `http://localhost:8000`.
 
 1. Digite tecnologias no campo de busca (ex: `python`, `django`, `react`)
 2. Pressione `Enter` ou `,` para adicionar cada uma
-3. Escolha o idioma: **PT** ou **EN**
-4. Clique em **Gerar AGENTS.md**
-5. Copie, baixe ou publique no GitHub Gist
+3. Clique em **Gerar AGENTS.md**
+4. Copie, baixe ou publique no GitHub Gist
+5. Use o modo **Visualizar/Editar** para ajustar o conteúdo
 
-## Tecnologias suportadas (até o momento)
+## Tecnologias suportadas (54)
 
-Python, Django, FastAPI, React, Next.js, Node.js, TypeScript, Docker, PostgreSQL, Redis, Tailwind CSS, DaisyUI, Flutter, Go, Rust, Vue, Svelte, Spring, Kotlin, Rails, Laravel, UV, JavaScript, PHP, Java, Spring Boot, MySQL, MongoDB, HTML, CSS, SCSS, Sass.
+```
+Python, Django, FastAPI, Flask, UV, Node.js, Express, NestJS, Next.js,
+Nuxt.js, React, Vue, Svelte, Angular, Astro, Vite, Vitest, Jest, Playwright,
+TypeScript, JavaScript, jQuery, HTML, CSS, SCSS, Sass, Tailwind CSS, DaisyUI,
+Go, Rust, Ruby, Rails, PHP, Laravel, Java, Kotlin, Spring, Spring Boot,
+C#, ASP.NET Core, Blazor, Dart, Flutter, Swift, C++, Bash,
+Docker, PostgreSQL, MySQL, MariaDB, MongoDB, Redis, Elasticsearch, SQLite
+```
 
 ## Arquitetura
 
 ### Visão geral
 
-O app não usa banco de dados para dados de usuário. Todo o conteúdo vem de arquivos Markdown em `agentictemplates/` combinados conforme as tecnologias selecionadas.
+O app usa **SQLite** como fonte única de verdade. As tecnologias e templates são gerenciados pelo ORM do Django. O conteúdo é populado via data migrations a partir de `generator/template_data.py`.
 
 ### Estrutura de diretórios
 
@@ -62,24 +68,24 @@ O app não usa banco de dados para dados de usuário. Todo o conteúdo vem de ar
 agentica-maker/
 ├── agentica/                  # Configuração do projeto Django
 │   ├── settings.py
-│   ├── urls.py                # Rotas raiz (admin + generator)
+│   ├── urls.py
 │   ├── wsgi.py / asgi.py
-├── agentictemplates/          # Templates Markdown
-│   ├── general.md             # Recomendações gerais (inglês)
-│   ├── python.md              # Comandos + estilo Python
-│   ├── django.md              # Comandos + boas práticas Django
-│   ├── ...                    # ~30 tecnologias
-│   └── *.pt.md                # Versões em português (cache)
 ├── generator/                 # App Django principal
-│   ├── views.py               # Lógica: index, result, download, gist
-│   ├── forms.py               # TechForm (technologies + language)
-│   ├── urls.py                # Rotas do app
-│   ├── templates/generator/
-│   │   ├── index.html         # Página inicial com autocomplete
-│   │   └── result.html        # Página de resultado com highlight
+│   ├── views.py               # Lógica de geração
+│   ├── models.py              # Technology + Template
+│   ├── forms.py               # TechForm
+│   ├── template_data.py       # Templates base (Markdown em Python)
+│   ├── code_examples_data.py  # Code Examples + Boundaries por tecnologia
+│   ├── version_fetcher.py     # Busca versões via API
+│   ├── admin.py
+│   ├── urls.py
+│   └── templates/generator/
+│       ├── index.html         # Página inicial com autocomplete
+│       └── result.html        # Resultado com highlight e edição
 ├── templates/
-│   └── base.html              # Base com nav, footer, tema
-├── pyproject.toml             # Dependências (UV)
+│   └── base.html              # Base com nav, footer
+├── tech_config.json           # Configuração (comandos, versão, ícone)
+├── pyproject.toml
 ├── AGENTS.md                  # AGENTS.md deste projeto
 └── README.md
 ```
@@ -87,11 +93,13 @@ agentica-maker/
 ### Fluxo de geração (`_build_content`)
 
 1. **Parse**: string comma-separada → lista de tecnologias
-2. **Match**: cada tecnologia é normalizada e buscada em `TECH_CONFIG`
+2. **Match**: normaliza e busca no banco de dados (`Technology`)
 3. **Separa**: `matched` (reconhecidas) e `unmatched` (não reconhecidas)
-4. **Carrega**: `general.md` + template de cada tecnologia no idioma escolhido
-5. **Junta**: todas as partes concatenadas com `\n\n---\n\n`
-6. **Renderiza**: `result.html` com o markdown final
+4. **Versões**: busca versão mais recente (cache de 1h via `version_fetcher.py`)
+5. **Carrega**: template geral (`general`) + template de cada tecnologia
+6. **Enriquece**: adiciona Code Examples + Boundaries dinamicamente
+7. **Junta**: frontmatter + persona + comandos + templates + footer
+8. **Renderiza**: `result.html` com o markdown final
 
 ### API Endpoints
 
@@ -106,7 +114,7 @@ agentica-maker/
 
 ```bash
 uv run python manage.py runserver   # Iniciar servidor
-uv run python manage.py check       # Verificar projeto
+uv run python manage.py migrate     # Migrações
 uv run python manage.py test        # Rodar testes
 uv run ruff check .                 # Lint
 uv run ruff format .                # Formatar

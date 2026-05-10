@@ -32,6 +32,9 @@ cov-run = "uv run coverage run manage.py test"
 cov-report = "uv run coverage report"
 cov-html = "uv run coverage html"
 
+[tool.poe.tasks.runner]
+sequence = ["migrations", "runserver"]
+
 [tool.poe.tasks.coverage]
 sequence = ["cov-run", "cov-report", "cov-html"]
 

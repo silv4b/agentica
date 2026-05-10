@@ -3,15 +3,13 @@ from pathlib import Path
 
 from django.db import migrations
 
-from generator.template_data import TEMPLATES
-
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-TECH_CONFIG_PATH = BASE_DIR / "tech_config.json"
 
 
 def load_tech_config(apps, schema_editor):
     Technology = apps.get_model("generator", "Technology")
-    with open(TECH_CONFIG_PATH, encoding="utf-8") as f:
+    path = BASE_DIR / "tech_config.json"
+    with open(path, encoding="utf-8") as f:
         data = json.load(f)
     objs = []
     for key, info in data.items():
@@ -23,7 +21,7 @@ def load_tech_config(apps, schema_editor):
                 test_command=info.get("test", ""),
                 lint_command=info.get("lint", ""),
                 style_command=info.get("style", ""),
-                devicon=info.get("devicon", ""),
+                devicon=info.get("devicon", "devicon-love2d-plain"),
             )
         )
     Technology.objects.bulk_create(objs)
@@ -32,10 +30,10 @@ def load_tech_config(apps, schema_editor):
 def load_templates(apps, schema_editor):
     Technology = apps.get_model("generator", "Technology")
     Template = apps.get_model("generator", "Template")
-
     tech_map = {t.key: t for t in Technology.objects.all()}
+    from generator.template_data import TEMPLATES
 
-    for lang in ("en", "pt"):
+    for lang in ("en",):
         for stem, content in TEMPLATES[lang].items():
             tech = tech_map.get(stem)
             Template.objects.create(
@@ -54,7 +52,7 @@ def reverse_func(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("generator", "0001_initial_models"),
+        ("generator", "0001_initial"),
     ]
 
     operations = [

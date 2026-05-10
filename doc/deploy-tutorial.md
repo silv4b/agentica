@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD040 MD036 -->
+<!-- markdownlint-disable MD040 MD036 MD060 -->
 
 # Tutorial de Deploy — Agentica Maker
 

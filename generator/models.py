@@ -9,13 +9,19 @@ class Technology(models.Model):
     lint_command = models.CharField(max_length=200, blank=True)
     style_command = models.CharField(max_length=200, blank=True)
     devicon = models.CharField(max_length=100, blank=True)
+    version_source = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Registro para buscar versão: pypi:nome, npm:nome, github:owner/repo, cargo:nome, rubygems:nome",
+    )
+    latest_version = models.CharField(max_length=50, blank=True)
+    version_checked_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "technologies"
         ordering = ["key"]
 
     def __str__(self):
-        """Retorna o nome de exibição da tecnologia."""
         return self.display_name
 
 
@@ -35,7 +41,6 @@ class Template(models.Model):
         unique_together = [("technology", "language")]
 
     def __str__(self):
-        """Retorna uma representação legível do template com tecnologia e idioma."""
         if self.technology:
             return f"{self.technology.key} ({self.language})"
         return f"general ({self.language})"

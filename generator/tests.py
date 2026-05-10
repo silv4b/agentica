@@ -7,10 +7,10 @@ from django.test import TestCase
 from django.urls import reverse
 
 from generator.forms import TechForm
-from generator.models import Technology, Template
 from generator.views import (
     _append_regen_link,
     _build_content,
+    _get_tech_config,
     _load_md,
     _match_tech,
     _normalize_tech,
@@ -18,130 +18,6 @@ from generator.views import (
     _pick,
     _tech_display_name,
 )
-
-TECH_KEYS = [
-    "angular",
-    "aspnetcore",
-    "astro",
-    "bash",
-    "blazor",
-    "cplusplus",
-    "csharp",
-    "css",
-    "daisyui",
-    "dart",
-    "django",
-    "docker",
-    "elasticsearch",
-    "express",
-    "fastapi",
-    "flask",
-    "flutter",
-    "go",
-    "html",
-    "java",
-    "javascript",
-    "jest",
-    "jquery",
-    "kotlin",
-    "laravel",
-    "mariadb",
-    "mongodb",
-    "mysql",
-    "nestjs",
-    "next.js",
-    "node",
-    "nuxt.js",
-    "php",
-    "playwright",
-    "postgresql",
-    "python",
-    "rails",
-    "react",
-    "redis",
-    "ruby",
-    "rust",
-    "sass",
-    "scss",
-    "spring",
-    "springboot",
-    "sqlite",
-    "svelte",
-    "swift",
-    "tailwind",
-    "typescript",
-    "uv",
-    "vite",
-    "vitest",
-    "vue",
-]
-
-DISPLAY_NAMES = {
-    "next.js": "Next.js",
-    "javascript": "JavaScript",
-    "typescript": "TypeScript",
-    "html": "HTML",
-    "css": "CSS",
-    "scss": "SCSS",
-    "sass": "Sass",
-    "fastapi": "FastAPI",
-    "postgresql": "PostgreSQL",
-    "mongodb": "MongoDB",
-    "mysql": "MySQL",
-    "springboot": "Spring Boot",
-    "daisyui": "DaisyUI",
-    "tailwind": "Tailwind CSS",
-    "uv": "UV",
-    "php": "PHP",
-    "java": "Java",
-    "go": "Go",
-    "rust": "Rust",
-    "vue": "Vue.js",
-    "node": "Node.js",
-    "flutter": "Flutter",
-    "kotlin": "Kotlin",
-    "rails": "Ruby on Rails",
-    "svelte": "Svelte",
-    "laravel": "Laravel",
-    "docker": "Docker",
-    "redis": "Redis",
-    "spring": "Spring",
-    "django": "Django",
-    "react": "React",
-    "python": "Python",
-    "angular": "Angular",
-    "aspnetcore": "ASP.NET Core",
-    "astro": "Astro",
-    "bash": "Bash",
-    "blazor": "Blazor",
-    "csharp": "C#",
-    "cplusplus": "C++",
-    "dart": "Dart",
-    "elasticsearch": "Elasticsearch",
-    "express": "Express",
-    "flask": "Flask",
-    "jest": "Jest",
-    "jquery": "jQuery",
-    "mariadb": "MariaDB",
-    "nestjs": "NestJS",
-    "nuxt.js": "Nuxt.js",
-    "playwright": "Playwright",
-    "ruby": "Ruby",
-    "sqlite": "SQLite",
-    "swift": "Swift",
-    "vite": "Vite",
-    "vitest": "Vitest",
-}
-
-
-def seed_techs():
-    """Popula o banco de teste com tecnologias padrão."""
-    for key in TECH_KEYS:
-        Technology.objects.create(
-            key=key,
-            display_name=DISPLAY_NAMES.get(key, key.capitalize()),
-            devicon="devicon-love2d-plain",
-        )
 
 
 class NormalizeTechTests(TestCase):
@@ -205,8 +81,9 @@ class MatchTechTests(TestCase):
         assert _match_tech("") is None
 
     def test_all_tech_keys_are_matchable_by_name(self):
-        """Todas as chaves registradas são encontráveis pelo próprio nome."""
-        for key in TECH_KEYS:
+        """Todas as chaves do tech_config.json são encontráveis pelo próprio nome."""
+        config = _get_tech_config()
+        for key in config:
             assert _match_tech(key) == key
 
     def test_normalized_variant_matches(self):
@@ -285,11 +162,12 @@ class PickTests(TestCase):
 
 
 class TechDisplayNameTests(TestCase):
-    def test_known_overrides(self):
-        """Todos os overrides conhecidos retornam o nome de exibição esperado."""
-        for key, expected in DISPLAY_NAMES.items():
+    def test_known_techs_return_expected_names(self):
+        """Nomes de exibição correspondem aos definidos no tech_config.json."""
+        config = _get_tech_config()
+        for key, tech in config.items():
             with self.subTest(key=key):
-                assert _tech_display_name(key) == expected
+                assert _tech_display_name(key) == tech.display_name
 
     def test_unknown_key_falls_back_to_capitalize(self):
         """Chave desconhecida usa capitalize como fallback."""
@@ -300,46 +178,39 @@ class TechDisplayNameTests(TestCase):
         assert _tech_display_name("some_tech") == "Some_tech"
 
     def test_all_tech_keys_have_display_names(self):
-        """Todas as chaves registradas possuem nome de exibição não vazio."""
-        for key in DISPLAY_NAMES:
+        """Todas as chaves do tech_config.json possuem nome de exibição não vazio."""
+        config = _get_tech_config()
+        for key in config:
             name = _tech_display_name(key)
             assert len(name) > 0
 
 
 class LoadMdTests(TestCase):
-    def test_loads_en_template_directly(self):
-        """Template EN existente no banco é carregado diretamente."""
-        en_general = Template.objects.get(technology__isnull=True, language="en")
-        en_general.content = "# General EN from DB"
-        en_general.save()
+    def test_loads_general_template(self):
+        """Template geral é carregado do template_data.py."""
         content = _load_md("general")
-        assert content == "# General EN from DB"
+        assert "General Recommendations" in content
+        assert content.startswith("# General")
 
     def test_returns_empty_for_nonexistent(self):
-        """Template inexistente no banco retorna string vazia."""
+        """Template inexistente retorna string vazia."""
         content = _load_md("nonexistent_tech_abcdef")
         assert content == ""
 
-    def test_loads_general_from_db(self):
-        """Template geral carregado do banco via data migration."""
+    def test_loads_general_in_english(self):
+        """Template geral carregado em inglês."""
         content = _load_md("general")
-        assert "General Recommendations" in content
+        assert content.startswith("# General Recommendations")
 
-    def test_db_content_is_returned(self):
-        """Conteúdo alterado no banco é retornado."""
-        en_general = Template.objects.get(technology__isnull=True, language="en")
-        en_general.content = "# General do banco"
-        en_general.save()
-        content = _load_md("general")
-        assert content == "# General do banco"
-
-    def test_tech_template_from_db(self):
-        """Template de tecnologia específica carregado do banco."""
-        py_en = Template.objects.get(technology__key="python", language="en")
-        py_en.content = "# Python from DB"
-        py_en.save()
+    def test_loads_tech_template(self):
+        """Template de tecnologia específica carregado."""
         content = _load_md("python")
-        assert content == "# Python from DB"
+        assert "# Python" in content
+
+    def test_contains_code_style_section(self):
+        """Template carregado contém seção de estilo de código."""
+        content = _load_md("python")
+        assert "Code Style" in content or "## Code Style" in content
 
 
 class AppendRegenLinkTests(TestCase):
@@ -376,6 +247,12 @@ class AppendRegenLinkTests(TestCase):
 
 
 class BuildContentTests(TestCase):
+    def setUp(self):
+        super().setUp()
+        patcher = patch("generator.views._ensure_versions")
+        self.mock_ensure_versions = patcher.start()
+        self.addCleanup(patcher.stop)
+
     @patch("generator.views._load_md")
     def test_build_content_with_multiple_techs(self, mock_load_md):
         """Conteúdo montado combina template geral com templates das tecnologias selecionadas."""
@@ -497,6 +374,12 @@ class IndexViewTests(TestCase):
 
 
 class ResultViewTests(TestCase):
+    def setUp(self):
+        super().setUp()
+        patcher = patch("generator.views._ensure_versions")
+        self.mock_ensure_versions = patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_result_get_returns_index_page(self):
         """GET /result/ redireciona para a página inicial com o formulário."""
         response = self.client.get(reverse("result"))
@@ -598,6 +481,12 @@ class ResultViewTests(TestCase):
 
 
 class DownloadViewTests(TestCase):
+    def setUp(self):
+        super().setUp()
+        patcher = patch("generator.views._ensure_versions")
+        self.mock_ensure_versions = patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_download_get_returns_405(self):
         """GET /download/ retorna 405 Method Not Allowed."""
         response = self.client.get(reverse("download"))

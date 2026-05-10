@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <div class="mt-3 flex flex-wrap items-center gap-2">
-                    <button type="submit" class="px-4 py-2 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary" style="padding-top: 6px; padding-bottom: 6px;">
+                    <button id="generate-btn" type="submit" class="px-4 py-2 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary" style="padding-top: 6px; padding-bottom: 6px;">
                         Gerar AGENTS.md
                     </button>
                     <span class="text-xs text-muted">
@@ -314,7 +314,11 @@ document.addEventListener('DOMContentLoaded', function() {
             tagInput.focus();
             tagInput.style.outline = 'none';
             tagContainer.style.borderColor = 'var(--border-hover)';
+            return;
         }
+        const btn = document.getElementById('generate-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading loading-spinner loading-xs"></span> Generating...';
     });
 
     badges.forEach(function(badge) {

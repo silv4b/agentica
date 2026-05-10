@@ -1,27 +1,27 @@
 import json
 import urllib.error
 import urllib.request
+from datetime import datetime, timezone
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
+from .code_examples_data import CODE_EXAMPLES
 from .forms import TechForm
 from .models import Technology, Template
+from .version_fetcher import fetch_latest_version, get_version_label, needs_version_check
 
 
 def _get_tech_config():
-    """Carrega configurações de tecnologia do banco."""
     return {t.key: t for t in Technology.objects.all()}
 
 
 def _normalize_tech(name):
-    """Normaliza um nome de tecnologia removendo espaços, pontos e cerquilhas."""
     return name.strip().lower().replace(".", "").replace("#", "")
 
 
 def _match_tech(raw_name):
-    """Tenta corresponder um nome bruto a uma chave válida de tecnologia."""
     normalized = _normalize_tech(raw_name)
     tech_config = _get_tech_config()
     for key in tech_config:
@@ -31,7 +31,6 @@ def _match_tech(raw_name):
 
 
 def _parse_technologies(raw):
-    """Converte uma string separada por vírgulas em uma lista de tecnologias."""
     result = []
     for t in raw.split(","):
         t = t.strip()
@@ -41,7 +40,6 @@ def _parse_technologies(raw):
 
 
 def _pick(items, prefer_keyword):
-    """Remove duplicatas mantendo a ordem e prioriza o item preferido no topo."""
     seen = set()
     result = []
     for item in items:
@@ -53,30 +51,32 @@ def _pick(items, prefer_keyword):
     return result
 
 
-def _tech_display_name(key: str) -> str:
-    """Retorna o nome de exibição amigável de uma tecnologia a partir de sua chave."""
+def _tech_display_name(key):
     tech = _get_tech_config().get(key)
     return tech.display_name if tech else key.capitalize()
 
 
 def _tech_devicon(key):
-    """Retorna a classe CSS do Devicon para a tecnologia, ou fallback se não houver ícone."""
     tech = _get_tech_config().get(key)
     return tech.devicon if tech else "devicon-love2d-plain"
 
 
 def _load_md(filename):
-    """Carrega o conteúdo de um template do banco (sempre em inglês)."""
     if filename == "general":
         tmpl = Template.objects.filter(technology__isnull=True, language="en").first()
     else:
         tmpl = Template.objects.filter(technology__key=filename, language="en").first()
-
-    return tmpl.content if tmpl else ""
+    content = tmpl.content if tmpl else ""
+    extra = CODE_EXAMPLES.get(filename)
+    if extra:
+        if extra.get("examples"):
+            content += "\n\n" + extra["examples"]
+        if extra.get("boundaries"):
+            content += "\n\n" + extra["boundaries"]
+    return content
 
 
 def _append_regen_link(content, matched, request):
-    """Appends a shareable URL at the end so the same result can be reproduced."""
     if matched:
         techs = ",".join(matched)
         url = request.build_absolute_uri(f"/result/?tech={techs}")
@@ -85,7 +85,6 @@ def _append_regen_link(content, matched, request):
 
 
 def index(request):
-    """Exibe a página inicial com o formulário de seleção de tecnologias."""
     form = TechForm()
     techs = _get_tech_config()
     supported_techs = sorted(techs.keys())
@@ -105,7 +104,6 @@ def index(request):
 
 
 def _render_result(request, agents_content, tech_list, matched, unmatched):
-    """Renderiza a página de resultado com o AGENTS.md gerado."""
     techs = _get_tech_config()
     matched_with_icons = [{"key": t, "icon": techs[t].devicon} for t in matched if t in techs]
     return render(
@@ -122,7 +120,6 @@ def _render_result(request, agents_content, tech_list, matched, unmatched):
 
 
 def result(request):
-    """Processa o formulário (POST) ou parâmetro ?tech= (GET) e renderiza o AGENTS.md."""
     if request.method == "GET":
         raw_techs = request.GET.get("tech", "").strip()
         if raw_techs:
@@ -142,7 +139,6 @@ def result(request):
 
 
 def download(request):
-    """Gera e força o download do arquivo AGENTS.md como attachment."""
     if request.method != "POST":
         return HttpResponse(status=405)
 
@@ -160,8 +156,23 @@ def download(request):
 
 
 @csrf_exempt
+def download_raw(request):
+    if request.method != "POST":
+        return HttpResponse(status=405)
+
+    content = request.POST.get("content", "").strip()
+    filename = request.POST.get("filename", "").strip() or "AGENTS.md"
+
+    if not content:
+        return HttpResponse(b"Content is required", status=400)
+
+    response = HttpResponse(content.encode("utf-8"), content_type="text/markdown; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return response
+
+
+@csrf_exempt
 def create_gist(request):
-    """Cria um Gist privado no GitHub com o conteúdo gerado, usando o token fornecido."""
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
@@ -172,7 +183,8 @@ def create_gist(request):
 
     content = body.get("content", "").strip()
     token = body.get("token", "").strip()
-    description = body.get("description", "AGENTS.md — generated by Agentica")
+    filename = body.get("filename", "").strip() or "AGENTS.md"
+    description = body.get("description", f"{filename} — generated by Agentica")
 
     if not content:
         return JsonResponse({"error": "Content is required"}, status=400)
@@ -184,7 +196,7 @@ def create_gist(request):
             "description": description,
             "public": False,
             "files": {
-                "AGENTS.md": {
+                filename: {
                     "content": content,
                 }
             },
@@ -222,8 +234,64 @@ def create_gist(request):
         return JsonResponse({"error": f"Network error: {e.reason}"}, status=502)
 
 
+def _ensure_versions(matched):
+    config = _get_tech_config()
+    now = datetime.now(tz=timezone.utc)
+    for key in matched:
+        tech = config.get(key)
+        if tech and needs_version_check(tech):
+            version = fetch_latest_version(tech.version_source)
+            if version:
+                Technology.objects.filter(pk=tech.pk).update(
+                    latest_version=version,
+                    version_checked_at=now,
+                )
+                tech.latest_version = version
+                tech.version_checked_at = now
+
+
+def _build_frontmatter(matched):
+    config = _get_tech_config()
+    labels = []
+    for key in matched:
+        tech = config.get(key)
+        if tech:
+            labels.append(get_version_label(tech))
+    tech_str = ", ".join(labels) if labels else "this project"
+    return f"---\nname: project-agent\ndescription: AI agent for {tech_str}\n---\n"
+
+
+def _build_persona(matched):
+    config = _get_tech_config()
+    if matched:
+        labels = []
+        for key in matched:
+            tech = config.get(key)
+            labels.append(get_version_label(tech) if tech else key.capitalize())
+        return f"You are an expert developer specializing in {', '.join(labels)}.\n"
+    return "You are an expert developer.\n"
+
+
+def _build_global_commands(matched):
+    config = _get_tech_config()
+    lines = []
+    for key in matched:
+        tech = config.get(key)
+        if not tech:
+            continue
+        label = get_version_label(tech)
+        if tech.run_command:
+            lines.append(f"- Run ({label}): `{tech.run_command}`")
+        if tech.test_command:
+            lines.append(f"- Test ({label}): `{tech.test_command}`")
+        if tech.lint_command:
+            lines.append(f"- Lint ({label}): `{tech.lint_command}`")
+    if lines:
+        return "## Commands\n\n" + "\n".join(lines) + "\n"
+    return ""
+
+
 def _build_content(raw_techs):
-    """Monta o conteúdo completo do AGENTS.md combinando os templates das tecnologias selecionadas."""
     tech_names = _parse_technologies(raw_techs)
 
     matched = []
@@ -237,7 +305,21 @@ def _build_content(raw_techs):
 
     matched = _pick(matched, matched[0] if matched else "")
 
+    _ensure_versions(matched)
+
     parts = []
+
+    frontmatter = _build_frontmatter(matched)
+    if frontmatter:
+        parts.append(frontmatter)
+
+    persona = _build_persona(matched)
+    if persona:
+        parts.append(persona)
+
+    global_commands = _build_global_commands(matched)
+    if global_commands:
+        parts.append(global_commands)
 
     general = _load_md("general")
     if general:
@@ -249,14 +331,16 @@ def _build_content(raw_techs):
             parts.append(content)
 
     if matched:
-        tech_names = []
+        config = _get_tech_config()
+        tech_labels = []
         for t in matched:
-            tech_names.append(_tech_display_name(t))
-        tech_list = ", ".join(tech_names)
+            tech = config.get(t)
+            tech_labels.append(get_version_label(tech) if tech else t.capitalize())
+        tech_list = ", ".join(tech_labels)
     else:
         tech_list = ", ".join(unmatched) if unmatched else "Nenhuma"
 
     agents_content = "\n---\n\n".join(parts)
-    agents_content += "\n<!-- Build with Agentica -->"
+    agents_content += "\n\n<!-- Build with Agentica -->"
 
     return agents_content, tech_list, matched, unmatched
