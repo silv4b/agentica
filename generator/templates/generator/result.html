@@ -23,24 +23,20 @@
                 <div class="flex flex-wrap justify-between items-center p-3 border-b border-theme gap-2">
                     <h2 id="template-title" class="text-base font-semibold text-primary">
                         AGENTS.md
-                        {% if lang == "pt" %}
-                            <span class="text-sm font-normal text-muted ml-2">para {{ tech_list }}</span>
-                        {% else %}
-                            <span class="text-sm font-normal text-muted ml-2">for {{ tech_list }}</span>
-                        {% endif %}
+                        <span class="text-sm font-normal text-muted ml-2">para {{ tech_list }}</span>
                     </h2>
                     <div class="flex flex-wrap gap-2">
                         <button onclick="copyContent()" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
                             <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                             </svg>
-                            <span>{% if lang == "pt" %}Copiar{% else %}Copy{% endif %}</span>
+                            <span>Copiar</span>
                         </button>
                         <button onclick="downloadContent()" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
                             <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
-                            <span>{% if lang == "pt" %}Download{% else %}Download{% endif %}</span>
+                            <span>Download</span>
                         </button>
                         <button onclick="document.getElementById('gist-modal').showModal()" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
                             <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="currentColor">
@@ -52,7 +48,7 @@
                             <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M7 7h10v10M7 17L17 7" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                            <span>{% if lang == "pt" %}Novo{% else %}New{% endif %}</span>
+                            <span>Novo</span>
                         </a>
                     </div>
                 </div>
@@ -75,40 +71,32 @@
             {% if unmatched %}
                 <div class="mb-6">
                     <h2 class="text-sm font-semibold text-primary mb-2">
-                        {% if lang == "pt" %}Tecnologias Não Reconhecidas{% else %}Unrecognized Technologies{% endif %}
+                        Tecnologias Não Reconhecidas
                     </h2>
                     <div class="p-3 border border-yellow-200 rounded bg-yellow-50 text-sm text-yellow-800">
                         <p class="font-medium mb-1">
-                            {% if lang == "pt" %}Estas não foram encontradas em nosso banco de dados:{% else %}These were not found in our database:{% endif %}
+                            Estas não foram encontradas em nosso banco de dados:
                         </p>
                         <p class="font-mono text-xs">{{ unmatched|join:", " }}</p>
                         <p class="text-xs mt-1">
-                            {% if lang == "pt" %}Foram incluídas, mas sem comandos específicos.{% else %}They were included but without specific commands.{% endif %}
+                            Foram incluídas, mas sem comandos específicos.
                         </p>
                     </div>
                 </div>
             {% endif %}
 
             <h2 class="text-sm font-semibold text-primary mb-2">
-                {% if lang == "pt" %}Gerado com{% else %}Generated with{% endif %}
+                Gerado com
             </h2>
             <p class="text-sm text-secondary mb-4">
-                {% if lang == "pt" %}
-                    {{ matched|length }} tecnologias encontradas
-                {% else %}
-                    {{ matched|length }} technologies matched
-                {% endif %}
+                {{ matched|length }} tecnologias encontradas
             </p>
             <div class="flex flex-wrap gap-1.5">
                 {% for item in matched_with_icons %}
                     <span class="px-2 py-0.5 text-xs border border-theme rounded text-secondary flex items-center gap-1"><i class="{{ item.icon }} tech-icon"></i> {{ item.key }}</span>
                 {% endfor %}
             </div>
-            <div class="mt-6 pt-4 border-t border-theme">
-                <span class="text-xs text-muted">
-                    {% if lang == "pt" %}Idioma: Português{% else %}Language: English{% endif %}
-                </span>
-            </div>
+
         </div>
     </div>
 </div>
@@ -119,16 +107,11 @@
         <div class="bg-card rounded-lg shadow-xl border border-theme w-full max-w-md">
             <div class="p-6">
                 <h3 class="text-lg font-semibold text-primary mb-2">
-                    {% if lang == "pt" %}Criar Gist no GitHub{% else %}Create GitHub Gist{% endif %}
+                    Criar Gist no GitHub
                 </h3>
                 <p class="text-sm text-secondary mb-4">
-                    {% if lang == "pt" %}
-                        Insira seu <strong>GitHub Personal Access Token</strong> para criar um gist privado com seu AGENTS.md.
-                        O token precisa apenas da permissão <code class="bg-subtle px-1 rounded text-xs text-primary">gist</code>.
-                    {% else %}
-                        Enter your <strong>GitHub Personal Access Token</strong> to create a private gist with your AGENTS.md.
-                        The token only needs the <code class="bg-subtle px-1 rounded text-xs text-primary">gist</code> scope.
-                    {% endif %}
+                    Insira seu <strong>GitHub Personal Access Token</strong> para criar um gist privado com seu AGENTS.md.
+                    O token precisa apenas da permissão <code class="bg-subtle px-1 rounded text-xs text-primary">gist</code>.
                 </p>
 
                 <div class="mb-4">
@@ -140,7 +123,7 @@
                         placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
                     >
                     <p class="text-xs text-muted mt-1">
-                        {% if lang == "pt" %}Crie um token em{% else %}Create a token at{% endif %}
+                        Crie um token em
                         <a class="text-secondary underline" href="https://github.com/settings/tokens" target="_blank" rel="noopener">github.com/settings/tokens</a>
                     </p>
                 </div>
@@ -149,11 +132,11 @@
 
                 <div class="flex justify-end gap-2">
                     <button onclick="closeGistModal()" class="px-3 py-1.5 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary">
-                        {% if lang == "pt" %}Cancelar{% else %}Cancel{% endif %}
+                        Cancelar
                     </button>
                     <button onclick="createGist()" id="gist-submit-btn" class="px-3 py-1.5 text-sm border border-theme rounded border-hover focus:outline-none bg-card text-primary flex items-center gap-2">
                         <span id="gist-btn-text">
-                            {% if lang == "pt" %}Criar Gist{% else %}Create Gist{% endif %}
+Criar Gist
                         </span>
                         <span id="gist-spinner" class="hidden">
                             <svg class="animate-spin h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none">
@@ -184,7 +167,7 @@ function copyContent() {
             <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            <span>{% if lang == "pt" %}Copiado!{% else %}Copied!{% endif %}</span>
+            <span>Copiado!</span>
         `;
         setTimeout(() => { btn.innerHTML = orig; }, 2000);
     }).catch(() => {
@@ -230,13 +213,13 @@ function showGistStatus(msg, type) {
 function setGistLoading(loading) {
     document.getElementById('gist-submit-btn').disabled = loading;
     document.getElementById('gist-spinner').classList.toggle('hidden', !loading);
-    document.getElementById('gist-btn-text').textContent = loading ? '{% if lang == "pt" %}Criando...{% else %}Creating...{% endif %}' : '{% if lang == "pt" %}Criar Gist{% else %}Create Gist{% endif %}';
+    document.getElementById('gist-btn-text').textContent = loading ? 'Criando...' : 'Criar Gist';
 }
 
 async function createGist() {
     const token = document.getElementById('gist-token').value.trim();
     if (!token) {
-        showGistStatus('{% if lang == "pt" %}Informe seu GitHub token.{% else %}Enter your GitHub token.{% endif %}', 'warning');
+        showGistStatus('Informe seu GitHub token.', 'warning');
         return;
     }
 
@@ -257,7 +240,7 @@ async function createGist() {
 
         if (!resp.ok) {
             const detail = data.detail || data.error || 'Unknown error';
-            let msg = data.error || '{% if lang == "pt" %}Falha ao criar gist{% else %}Failed to create gist{% endif %}';
+            let msg = data.error || 'Falha ao criar gist';
             try {
                 const parsed = JSON.parse(detail);
                 msg = parsed.message || msg;
@@ -270,11 +253,11 @@ async function createGist() {
         document.getElementById('gist-token').value = '';
         setGistLoading(false);
         showGistStatus(
-            '{% if lang == "pt" %}Gist criado! <a href="' + data.url + '" target="_blank" rel="noopener" class="underline font-medium">Abrir gist &rarr;</a>{% else %}Gist created! <a href="' + data.url + '" target="_blank" rel="noopener" class="underline font-medium">Open gist &rarr;</a>{% endif %}',
+            'Gist criado! <a href="' + data.url + '" target="_blank" rel="noopener" class="underline font-medium">Abrir gist &rarr;</a>',
             'success'
         );
     } catch (err) {
-        showGistStatus('{% if lang == "pt" %}Erro de rede: {% else %}Network error: {% endif %}' + err.message, 'error');
+        showGistStatus('Erro de rede: ' + err.message, 'error');
         setGistLoading(false);
     }
 }

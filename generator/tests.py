@@ -1,6 +1,5 @@
 import json
 from email.message import Message
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError, URLError
 
@@ -8,8 +7,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from generator.forms import TechForm
+from generator.models import Technology, Template
 from generator.views import (
-    TECH_CONFIG,
     _build_content,
     _load_md,
     _match_tech,
@@ -17,8 +16,131 @@ from generator.views import (
     _parse_technologies,
     _pick,
     _tech_display_name,
-    _translation_cache,
 )
+
+TECH_KEYS = [
+    "angular",
+    "aspnetcore",
+    "astro",
+    "bash",
+    "blazor",
+    "cplusplus",
+    "csharp",
+    "css",
+    "daisyui",
+    "dart",
+    "django",
+    "docker",
+    "elasticsearch",
+    "express",
+    "fastapi",
+    "flask",
+    "flutter",
+    "go",
+    "html",
+    "java",
+    "javascript",
+    "jest",
+    "jquery",
+    "kotlin",
+    "laravel",
+    "mariadb",
+    "mongodb",
+    "mysql",
+    "nestjs",
+    "next.js",
+    "node",
+    "nuxt.js",
+    "php",
+    "playwright",
+    "postgresql",
+    "python",
+    "rails",
+    "react",
+    "redis",
+    "ruby",
+    "rust",
+    "sass",
+    "scss",
+    "spring",
+    "springboot",
+    "sqlite",
+    "svelte",
+    "swift",
+    "tailwind",
+    "typescript",
+    "uv",
+    "vite",
+    "vitest",
+    "vue",
+]
+
+DISPLAY_NAMES = {
+    "next.js": "Next.js",
+    "javascript": "JavaScript",
+    "typescript": "TypeScript",
+    "html": "HTML",
+    "css": "CSS",
+    "scss": "SCSS",
+    "sass": "Sass",
+    "fastapi": "FastAPI",
+    "postgresql": "PostgreSQL",
+    "mongodb": "MongoDB",
+    "mysql": "MySQL",
+    "springboot": "Spring Boot",
+    "daisyui": "DaisyUI",
+    "tailwind": "Tailwind CSS",
+    "uv": "UV",
+    "php": "PHP",
+    "java": "Java",
+    "go": "Go",
+    "rust": "Rust",
+    "vue": "Vue.js",
+    "node": "Node.js",
+    "flutter": "Flutter",
+    "kotlin": "Kotlin",
+    "rails": "Ruby on Rails",
+    "svelte": "Svelte",
+    "laravel": "Laravel",
+    "docker": "Docker",
+    "redis": "Redis",
+    "spring": "Spring",
+    "django": "Django",
+    "react": "React",
+    "python": "Python",
+    "angular": "Angular",
+    "aspnetcore": "ASP.NET Core",
+    "astro": "Astro",
+    "bash": "Bash",
+    "blazor": "Blazor",
+    "csharp": "C#",
+    "cplusplus": "C++",
+    "dart": "Dart",
+    "elasticsearch": "Elasticsearch",
+    "express": "Express",
+    "flask": "Flask",
+    "jest": "Jest",
+    "jquery": "jQuery",
+    "mariadb": "MariaDB",
+    "nestjs": "NestJS",
+    "nuxt.js": "Nuxt.js",
+    "playwright": "Playwright",
+    "ruby": "Ruby",
+    "sqlite": "SQLite",
+    "swift": "Swift",
+    "vite": "Vite",
+    "vitest": "Vitest",
+}
+
+
+def seed_techs():
+    """Popula o banco de teste com tecnologias padrão."""
+    for key in TECH_KEYS:
+        Technology.objects.create(
+            key=key,
+            display_name=DISPLAY_NAMES.get(key, key.capitalize()),
+            devicon="devicon-love2d-plain",
+        )
 
 
 class NormalizeTechTests(TestCase):
@@ -54,7 +176,7 @@ class NormalizeTechTests(TestCase):
 
 class MatchTechTests(TestCase):
     def test_exact_match(self):
-        """Match exato com chave do TECH_CONFIG."""
+        """Match exato com chave de tecnologia."""
         assert _match_tech("python") == "python"
 
     def test_case_insensitive_match(self):
@@ -81,9 +203,9 @@ class MatchTechTests(TestCase):
         """String vazia retorna None."""
         assert _match_tech("") is None
 
-    def test_all_tech_config_keys_are_matchable_by_name(self):
-        """Todas as chaves do TECH_CONFIG são encontráveis pelo próprio nome."""
-        for key in TECH_CONFIG:
+    def test_all_tech_keys_are_matchable_by_name(self):
+        """Todas as chaves registradas são encontráveis pelo próprio nome."""
+        for key in TECH_KEYS:
             assert _match_tech(key) == key
 
     def test_normalized_variant_matches(self):
@@ -164,63 +286,7 @@ class PickTests(TestCase):
 class TechDisplayNameTests(TestCase):
     def test_known_overrides(self):
         """Todos os overrides conhecidos retornam o nome de exibição esperado."""
-        cases = {
-            "next.js": "Next.js",
-            "javascript": "JavaScript",
-            "typescript": "TypeScript",
-            "html": "HTML",
-            "css": "CSS",
-            "scss": "SCSS",
-            "sass": "Sass",
-            "fastapi": "FastAPI",
-            "postgresql": "PostgreSQL",
-            "mongodb": "MongoDB",
-            "mysql": "MySQL",
-            "springboot": "Spring Boot",
-            "daisyui": "DaisyUI",
-            "tailwind": "Tailwind CSS",
-            "uv": "UV",
-            "php": "PHP",
-            "java": "Java",
-            "go": "Go",
-            "rust": "Rust",
-            "vue": "Vue.js",
-            "node": "Node.js",
-            "flutter": "Flutter",
-            "kotlin": "Kotlin",
-            "rails": "Ruby on Rails",
-            "svelte": "Svelte",
-            "laravel": "Laravel",
-            "docker": "Docker",
-            "redis": "Redis",
-            "spring": "Spring",
-            "django": "Django",
-            "react": "React",
-            "python": "Python",
-            "angular": "Angular",
-            "aspnetcore": "ASP.NET Core",
-            "astro": "Astro",
-            "bash": "Bash",
-            "blazor": "Blazor",
-            "csharp": "C#",
-            "cplusplus": "C++",
-            "dart": "Dart",
-            "elasticsearch": "Elasticsearch",
-            "express": "Express",
-            "flask": "Flask",
-            "jest": "Jest",
-            "jquery": "jQuery",
-            "mariadb": "MariaDB",
-            "nestjs": "NestJS",
-            "nuxt.js": "Nuxt.js",
-            "playwright": "Playwright",
-            "ruby": "Ruby",
-            "sqlite": "SQLite",
-            "swift": "Swift",
-            "vite": "Vite",
-            "vitest": "Vitest",
-        }
-        for key, expected in cases.items():
+        for key, expected in DISPLAY_NAMES.items():
             with self.subTest(key=key):
                 assert _tech_display_name(key) == expected
 
@@ -232,185 +298,54 @@ class TechDisplayNameTests(TestCase):
         """Chave com underline é capitalizada parcialmente."""
         assert _tech_display_name("some_tech") == "Some_tech"
 
-    def test_all_tech_config_keys_have_display_names(self):
-        """Todas as chaves do TECH_CONFIG possuem nome de exibição não vazio."""
-        for key in TECH_CONFIG:
+    def test_all_tech_keys_have_display_names(self):
+        """Todas as chaves registradas possuem nome de exibição não vazio."""
+        for key in DISPLAY_NAMES:
             name = _tech_display_name(key)
             assert len(name) > 0
 
 
 class LoadMdTests(TestCase):
-    def setUp(self):
-        """Limpa o cache de tradução antes de cada teste."""
-        _translation_cache.clear()
+    def test_loads_en_template_directly(self):
+        """Template EN existente no banco é carregado diretamente."""
+        en_general = Template.objects.get(technology__isnull=True, language="en")
+        en_general.content = "# General EN from DB"
+        en_general.save()
+        content = _load_md("general")
+        assert content == "# General EN from DB"
 
-    def test_loads_pt_file_when_exists(self):
-        """Arquivo .pt.md existente é carregado diretamente."""
-        content = _load_md("general", lang="pt")
-        assert "Recomendações Gerais" in content
-
-    def test_loads_en_file_directly(self):
-        """Idioma inglês carrega o arquivo base sem tradução."""
-        content = _load_md("general", lang="en")
-        assert "General Recommendations" in content
-
-    def test_returns_empty_for_nonexistent_file(self):
-        """Arquivo inexistente retorna string vazia."""
+    def test_returns_empty_for_nonexistent(self):
+        """Template inexistente no banco retorna string vazia."""
         content = _load_md("nonexistent_tech_abcdef")
         assert content == ""
 
-    def test_en_returns_base_file_without_translation(self):
-        """Idioma inglês retorna conteúdo do arquivo base."""
-        content = _load_md("python", lang="en")
-        assert "# Python" in content
+    def test_loads_general_from_db(self):
+        """Template geral carregado do banco via data migration."""
+        content = _load_md("general")
+        assert "General Recommendations" in content
 
-    def test_pt_and_en_differ_when_both_exist(self):
-        """Conteúdo em português e inglês são diferentes quando ambos existem."""
-        pt_content = _load_md("general", lang="pt")
-        en_content = _load_md("general", lang="en")
-        assert pt_content != en_content
+    def test_db_content_is_returned(self):
+        """Conteúdo alterado no banco é retornado."""
+        en_general = Template.objects.get(technology__isnull=True, language="en")
+        en_general.content = "# General do banco"
+        en_general.save()
+        content = _load_md("general")
+        assert content == "# General do banco"
 
-    def test_translation_path(self):
-        """Fluxo de tradução é acionado quando apenas o arquivo base existe."""
-        _translation_cache.clear()
-        original_exists = Path.exists
-        original_read_text = Path.read_text
-        original_mkdir = Path.mkdir
-        original_write_text = Path.write_text
-
-        def controlled_exists(self):
-            name = str(self)
-            if "test_tech" in name:
-                return "en" in self.parts
-            return original_exists(self)
-
-        def controlled_read_text(self, **kwargs):
-            name = str(self)
-            if "test_tech" in name:
-                return "English test content"
-            return original_read_text(self, **kwargs)
-
-        def controlled_mkdir(self, **kwargs):
-            if "test_tech" in str(self):
-                return None
-            return original_mkdir(self, **kwargs)
-
-        def controlled_write_text(self, content, **kwargs):
-            if "test_tech" in str(self):
-                return None
-            return original_write_text(self, content, **kwargs)
-
-        with (
-            patch.object(Path, "exists", controlled_exists),
-            patch.object(Path, "read_text", controlled_read_text),
-            patch.object(Path, "mkdir", controlled_mkdir),
-            patch.object(Path, "write_text", controlled_write_text),
-            patch("deep_translator.GoogleTranslator") as mock_gt,
-        ):
-            mock_gt.return_value.translate.return_value = "Conteúdo de teste"
-            result = _load_md("test_tech", lang="pt")
-
-        assert result == "Conteúdo de teste"
-        mock_gt.return_value.translate.assert_called_once_with("English test content")
-
-    def test_translation_is_cached(self):
-        """Tradução é armazenada em cache e reutilizada na segunda chamada."""
-        _translation_cache.clear()
-        original_exists = Path.exists
-        original_read_text = Path.read_text
-
-        def controlled_exists(self):
-            name = str(self)
-            if "test_cache" in name:
-                return "en" in self.parts
-            return original_exists(self)
-
-        def controlled_read_text(self, **kwargs):
-            name = str(self)
-            if "test_cache" in name:
-                return "Cache test content"
-            return original_read_text(self, **kwargs)
-
-        with (
-            patch.object(Path, "exists", controlled_exists),
-            patch.object(Path, "read_text", controlled_read_text),
-            patch.object(Path, "mkdir", return_value=None),
-            patch.object(Path, "write_text", return_value=None),
-            patch("deep_translator.GoogleTranslator") as mock_gt,
-        ):
-            mock_gt.return_value.translate.return_value = "Conteúdo em cache"
-
-            result1 = _load_md("test_cache", lang="pt")
-            assert result1 == "Conteúdo em cache"
-
-            result2 = _load_md("test_cache", lang="pt")
-            assert result2 == "Conteúdo em cache"
-            assert mock_gt.return_value.translate.call_count == 1
-
-    def test_translation_failure_returns_original_text(self):
-        """Falha na API de tradução retorna o texto original em inglês."""
-        _translation_cache.clear()
-        original_exists = Path.exists
-        original_read_text = Path.read_text
-
-        def controlled_exists(self):
-            name = str(self)
-            if "test_fail" in name:
-                return "en" in self.parts
-            return original_exists(self)
-
-        def controlled_read_text(self, **kwargs):
-            name = str(self)
-            if "test_fail" in name:
-                return "Original English text"
-            return original_read_text(self, **kwargs)
-
-        with (
-            patch.object(Path, "exists", controlled_exists),
-            patch.object(Path, "read_text", controlled_read_text),
-            patch("deep_translator.GoogleTranslator") as mock_gt,
-        ):
-            mock_gt.side_effect = Exception("Translation API unavailable")
-            result = _load_md("test_fail", lang="pt")
-
-        assert result == "Original English text"
-
-    def test_pt_file_takes_precedence_over_base(self):
-        """Arquivo .pt.md tem precedência sobre o arquivo base quando existe."""
-        _translation_cache.clear()
-        original_exists = Path.exists
-        original_read_text = Path.read_text
-
-        def controlled_exists(self):
-            name = str(self)
-            if "test_prec" in name:
-                return name.endswith((".md", ".pt.md"))
-            return original_exists(self)
-
-        def controlled_read_text(self, **kwargs):
-            name = str(self)
-            if "test_prec" in name:
-                return "Conteúdo PT" if "pt" in self.parts else "Base content"
-            return original_read_text(self, **kwargs)
-
-        with (
-            patch.object(Path, "exists", controlled_exists),
-            patch.object(Path, "read_text", controlled_read_text),
-        ):
-            result = _load_md("test_prec", lang="pt")
-
-        assert result == "Conteúdo PT"
+    def test_tech_template_from_db(self):
+        """Template de tecnologia específica carregado do banco."""
+        py_en = Template.objects.get(technology__key="python", language="en")
+        py_en.content = "# Python from DB"
+        py_en.save()
+        content = _load_md("python")
+        assert content == "# Python from DB"
 
 
 class BuildContentTests(TestCase):
-    def setUp(self):
-        """Limpa o cache de tradução antes de cada teste."""
-        _translation_cache.clear()
-
     @patch("generator.views._load_md")
     def test_build_content_with_multiple_techs(self, mock_load_md):
         """Conteúdo montado combina template geral com templates das tecnologias selecionadas."""
-        mock_load_md.side_effect = lambda f, lang: {
+        mock_load_md.side_effect = lambda f: {
             "general": "# General Recommendations",
             "python": "# Python Instructions",
             "django": "# Django Instructions",
@@ -421,7 +356,7 @@ class BuildContentTests(TestCase):
         assert "# General Recommendations" in content
         assert "# Python Instructions" in content
         assert "# Django Instructions" in content
-        assert "Feito com Agentica" in content
+        assert "Build with Agentica" in content
         assert tech_list == "Python, Django"
         assert matched == ["python", "django"]
         assert unmatched == []
@@ -429,7 +364,7 @@ class BuildContentTests(TestCase):
     @patch("generator.views._load_md")
     def test_build_content_with_unmatched_techs(self, mock_load_md):
         """Tecnologias não reconhecidas são separadas como unmatched."""
-        mock_load_md.side_effect = lambda f, lang: {
+        mock_load_md.side_effect = lambda f: {
             "general": "# General",
             "python": "# Python",
         }.get(f, "")
@@ -457,18 +392,9 @@ class BuildContentTests(TestCase):
         assert tech_list == "foo, bar, baz"
 
     @patch("generator.views._load_md")
-    def test_build_content_passes_language_to_load_md(self, mock_load_md):
-        """O parâmetro lang é repassado para _load_md em todas as chamadas."""
-        mock_load_md.return_value = "# Content"
-        _build_content("python", lang="en")
-        for call_args in mock_load_md.call_args_list:
-            _name, kwargs = call_args
-            assert kwargs.get("lang") == "en"
-
-    @patch("generator.views._load_md")
     def test_build_content_deduplicates_techs(self, mock_load_md):
         """Tecnologias duplicadas com variações de caixa são reduzidas a uma."""
-        mock_load_md.side_effect = lambda f, lang: {
+        mock_load_md.side_effect = lambda f: {
             "general": "# General",
             "python": "# Python",
         }.get(f, "")
@@ -480,7 +406,7 @@ class BuildContentTests(TestCase):
     @patch("generator.views._load_md")
     def test_build_content_preserves_tech_order_with_preferred_first(self, mock_load_md):
         """A primeira tecnologia da lista é posicionada no topo, as demais em ordem alfabética."""
-        mock_load_md.side_effect = lambda f, lang: {
+        mock_load_md.side_effect = lambda f: {
             "general": "# General",
             "django": "# Django",
             "react": "# React",
@@ -492,15 +418,15 @@ class BuildContentTests(TestCase):
 
     @patch("generator.views._load_md")
     def test_build_content_footer_present(self, mock_load_md):
-        """O footer 'Feito com Agentica' está sempre presente no conteúdo gerado."""
+        """O footer 'Build with Agentica' está sempre presente no conteúdo gerado."""
         mock_load_md.return_value = "# Some content"
         content, tech_list, matched, unmatched = _build_content("python")
-        assert "Feito com Agentica" in content
+        assert "Build with Agentica" in content
 
     @patch("generator.views._load_md")
     def test_build_content_removes_blank_template(self, mock_load_md):
         """Templates vazios são omitidos do conteúdo final."""
-        mock_load_md.side_effect = lambda f, lang: {
+        mock_load_md.side_effect = lambda f: {
             "general": "# General",
             "python": "",
         }.get(f, "")
@@ -550,9 +476,9 @@ class ResultViewTests(TestCase):
         self.assertTemplateUsed(response, "generator/index.html")
 
     @patch("generator.views._load_md")
-    def test_result_post_valid_pt(self, mock_load_md):
-        """POST /result/ válido com idioma pt renderiza result.html com lang='pt'."""
-        mock_load_md.side_effect = lambda f, lang: {
+    def test_result_post_valid(self, mock_load_md):
+        """POST /result/ válido renderiza result.html."""
+        mock_load_md.side_effect = lambda f: {
             "general": "# General",
             "python": "# Python",
         }.get(f, "")
@@ -561,35 +487,15 @@ class ResultViewTests(TestCase):
             reverse("result"),
             {
                 "technologies": "python",
-                "language": "pt",
             },
         )
         assert response.status_code == 200
         self.assertTemplateUsed(response, "generator/result.html")
-        assert response.context["lang"] == "pt"
-
-    @patch("generator.views._load_md")
-    def test_result_post_valid_en(self, mock_load_md):
-        """POST /result/ válido com idioma en renderiza result.html com lang='en'."""
-        mock_load_md.side_effect = lambda f, lang: {
-            "general": "# General",
-            "python": "# Python",
-        }.get(f, "")
-
-        response = self.client.post(
-            reverse("result"),
-            {
-                "technologies": "python",
-                "language": "en",
-            },
-        )
-        assert response.status_code == 200
-        assert response.context["lang"] == "en"
 
     @patch("generator.views._load_md")
     def test_result_shows_matched_and_unmatched(self, mock_load_md):
         """O contexto da view diferencia tecnologias reconhecidas de não reconhecidas."""
-        mock_load_md.side_effect = lambda f, lang: {
+        mock_load_md.side_effect = lambda f: {
             "general": "# General",
             "python": "# Python",
         }.get(f, "")
@@ -598,7 +504,6 @@ class ResultViewTests(TestCase):
             reverse("result"),
             {
                 "technologies": "python, unknown_tech",
-                "language": "pt",
             },
         )
         assert response.context["matched"] == ["python"]
@@ -606,7 +511,7 @@ class ResultViewTests(TestCase):
 
     def test_result_missing_technologies_field(self):
         """POST /result/ sem o campo technologies renderiza index com erros."""
-        response = self.client.post(reverse("result"), {"language": "pt"})
+        response = self.client.post(reverse("result"), {})
         assert response.status_code == 200
         self.assertTemplateUsed(response, "generator/index.html")
 
@@ -625,7 +530,7 @@ class DownloadViewTests(TestCase):
     @patch("generator.views._load_md")
     def test_download_post_valid(self, mock_load_md):
         """POST /download/ válido retorna arquivo com Content-Disposition attachment."""
-        mock_load_md.side_effect = lambda f, lang: {
+        mock_load_md.side_effect = lambda f: {
             "general": "# General",
             "python": "# Python",
         }.get(f, "")
@@ -634,7 +539,6 @@ class DownloadViewTests(TestCase):
             reverse("download"),
             {
                 "technologies": "python",
-                "language": "pt",
             },
         )
         assert response.status_code == 200
@@ -644,7 +548,7 @@ class DownloadViewTests(TestCase):
     @patch("generator.views._load_md")
     def test_download_contains_content(self, mock_load_md):
         """O conteúdo baixado inclui o footer do Agentica Maker."""
-        mock_load_md.side_effect = lambda f, lang: {
+        mock_load_md.side_effect = lambda f: {
             "general": "# General",
             "python": "# Python",
         }.get(f, "")
@@ -653,11 +557,10 @@ class DownloadViewTests(TestCase):
             reverse("download"),
             {
                 "technologies": "python",
-                "language": "pt",
             },
         )
         content = response.content.decode("utf-8")
-        assert "Feito com Agentica" in content
+        assert "Build with Agentica" in content
 
 
 class CreateGistViewTests(TestCase):
@@ -800,34 +703,19 @@ class CreateGistViewTests(TestCase):
 
 class TechFormTests(TestCase):
     def test_form_valid(self):
-        """Formulário é válido com tecnologias e idioma pt."""
-        form = TechForm(data={"technologies": "python, django", "language": "pt"})
-        assert form.is_valid()
-
-    def test_form_valid_en(self):
-        """Formulário é válido com tecnologias e idioma en."""
-        form = TechForm(data={"technologies": "python", "language": "en"})
+        """Formulário é válido com tecnologias."""
+        form = TechForm(data={"technologies": "python, django"})
         assert form.is_valid()
 
     def test_form_missing_technologies(self):
         """Formulário sem tecnologias é inválido."""
-        form = TechForm(data={"language": "pt"})
-        assert not form.is_valid()
-
-    def test_form_invalid_language(self):
-        """Formulário com idioma inválido (de) é inválido."""
-        form = TechForm(data={"technologies": "python", "language": "de"})
+        form = TechForm(data={})
         assert not form.is_valid()
 
     def test_form_empty_technologies_is_invalid(self):
         """Formulário com tecnologias vazias é inválido."""
-        form = TechForm(data={"technologies": "", "language": "pt"})
+        form = TechForm(data={"technologies": ""})
         assert not form.is_valid()
-
-    def test_form_initial_language_is_pt(self):
-        """O valor inicial do campo language é 'pt'."""
-        form = TechForm()
-        assert form.fields["language"].initial == "pt"
 
 
 class URLTests(TestCase):

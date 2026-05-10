@@ -6,7 +6,7 @@ O Agentica é um gerador arquivos `AGENTS.md` base para seus projetos, com instr
 ## Funcionalidades
 
 - **Seleção de tecnologias** — Autocomplete com ~30 tecnologias suportadas (Python, Django, React, Docker, etc.)
-- **Idioma PT/EN** — O conteúdo é gerado em inglês por padrão ou traduzido para português via Google Translate com cache em disco
+- **Idioma** — O conteúdo é gerado em português
 - **Copiar / Download** — Copie o resultado para a área de transferência ou baixe como `AGENTS.md`
 - **GitHub Gist** — Crie um gist privado diretamente pela interface com seu token do GitHub
 - **Highlight de sintaxe** — Código destacado com highlight.js + numeração de linhas
@@ -17,7 +17,7 @@ O Agentica é um gerador arquivos `AGENTS.md` base para seus projetos, com instr
 |---|---|
 | **Django 6.0+** | Framework web |
 | **Python 3.12+** | Linguagem |
-| **deep-translator** | Tradução automática EN → PT |
+
 | **Tailwind CSS** (CDN) | Estilização |
 | **highlight.js** | Syntax highlight no resultado |
 | **SQLite** | Banco (apenas para admin do Django) |

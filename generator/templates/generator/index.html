@@ -13,7 +13,6 @@
             <form id="tech-form" method="post" action="{% url 'result' %}">
                 {% csrf_token %}
                 {{ form.technologies }}
-                {{ form.language }}
                 <div class="tag-input-wrapper">
                     <div id="tag-container" class="tag-container w-full px-3 py-2 text-sm text-primary border border-theme rounded bg-input">
                         <input
@@ -31,10 +30,6 @@
                     <button type="submit" class="px-4 py-2 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary" style="padding-top: 6px; padding-bottom: 6px;">
                         Gerar AGENTS.md
                     </button>
-                    <div class="flex items-center border border-theme rounded overflow-hidden text-sm">
-                        <button type="button" id="lang-pt" class="lang-btn px-3 py-2 bg-subtle text-secondary font-medium" data-lang="pt">PT</button>
-                        <button type="button" id="lang-en" class="lang-btn px-3 py-2 text-muted hover:text-secondary" data-lang="en">EN</button>
-                    </div>
                     <span class="text-xs text-muted">
                         Pressione <kbd class="px-1 py-0.5 border border-theme rounded text-xs bg-subtle text-secondary">Enter</kbd> ou <kbd class="px-1 py-0.5 border border-theme rounded text-xs bg-subtle text-secondary">,</kbd> para adicionar
                     </span>
@@ -370,26 +365,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (searchClear) {
         searchClear.addEventListener('click', clearSidebarSearch);
     }
-
-    // Language toggle
-    const langInput = document.querySelector('select[name="language"], input[name="language"]');
-    const langBtns = document.querySelectorAll('.lang-btn');
-    function updateLangUI(lang) {
-        langBtns.forEach(function(btn) {
-            if (btn.dataset.lang === lang) {
-                btn.className = 'lang-btn px-3 py-1.5 bg-subtle text-secondary font-medium';
-            } else {
-                btn.className = 'lang-btn px-3 py-1.5 text-muted hover:text-secondary';
-            }
-        });
-        if (langInput) langInput.value = lang;
-    }
-    langBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            updateLangUI(btn.dataset.lang);
-        });
-    });
-    updateLangUI(langInput ? langInput.value : 'pt');
 
     // Sidebar toggle (mobile drawer)
     function toggleSidebar() {
