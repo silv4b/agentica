@@ -10,7 +10,7 @@ Gera arquivos `AGENTS.md` com instruções personalizadas para ensinar agentes d
 - **Versões automáticas** — Detecta a versão mais recente de cada tecnologia (PyPI, npm, GitHub, RubyGems, Cargo)
 - **Code Examples** — Exemplos de código bom/ruim para cada tecnologia
 - **Boundaries** — Regras do que fazer/perguntar/nunca fazer para cada tecnologia
-- **Copiar / Download** — Copie o resultado ou baixe como `AGENTS.md`
+- **Copiar / Download** — Copie o resultado ou baixe com nome personalizado
 - **GitHub Gist** — Crie um gist privado diretamente pela interface
 - **Modo edição** — Visualize e edite o conteúdo gerado antes de salvar
 
@@ -83,7 +83,8 @@ agentica-maker/
 │       ├── index.html         # Página inicial com autocomplete
 │       └── result.html        # Resultado com highlight e edição
 ├── templates/
-│   └── base.html              # Base com nav, footer
+│   ├── base.html              # Base com nav, footer
+│   └── 404.html               # Página 404 personalizada
 ├── tech_config.json           # Configuração (comandos, versão, ícone)
 ├── pyproject.toml
 ├── AGENTS.md                  # AGENTS.md deste projeto
@@ -106,8 +107,10 @@ agentica-maker/
 | Método | Rota | Descrição |
 |---|---|---|
 | `GET` | `/` | Página inicial |
+| `GET` | `/result/?tech=...` | Exibe resultado a partir de link compartilhado |
 | `POST` | `/result/` | Gera AGENTS.md e exibe resultado |
-| `POST` | `/download/` | Download do arquivo AGENTS.md |
+| `POST` | `/download/` | Download via formulário (índice) |
+| `POST` | `/download-raw/` | Download com nome personalizado (resultado) |
 | `POST` | `/create-gist/` | Cria gist privado no GitHub |
 
 ## Comandos
