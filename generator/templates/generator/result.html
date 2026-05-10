@@ -50,6 +50,12 @@
                             </svg>
                             <span>Compartilhar</span>
                         </button>
+                        <button onclick="toggleEditMode()" id="edit-btn" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
+                            <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            <span>Editar</span>
+                        </button>
                         <a href="{% url 'index' %}" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
                             <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M7 7h10v10M7 17L17 7" stroke-linecap="round" stroke-linejoin="round"/>
@@ -58,7 +64,14 @@
                         </a>
                     </div>
                 </div>
-                <pre class="p-4 m-0 overflow-x-auto"><code id="agents-content" class="hljs" style="background:#282c34;color:#abb2bf;font-size:13px;line-height:1.45;white-space:pre;word-wrap:normal;">{{ agents_content }}</code></pre>
+                <div id="agents-viewer" class="">
+                    <pre class="p-4 m-0 overflow-x-auto"><code id="agents-content" class="hljs" style="background:#282c34;color:#abb2bf;font-size:13px;line-height:1.45;white-space:pre;word-wrap:normal;padding:0;">{{ agents_content }}</code></pre>
+                </div>
+                <div id="editor-wrapper" class="hidden" style="position:relative;background:#282c34;">
+                    <div id="editor-lines" style="padding:1rem 0 1rem 1rem;text-align:right;color:#495162;font-size:13px;line-height:1.45;font-family:monospace;overflow:hidden;user-select:none;white-space:pre;flex-shrink:0;">1</div>
+                    <textarea id="agents-editor" style="flex:1;background:#282c34;color:#abb2bf;font-size:13px;line-height:1.45;font-family:monospace;padding:1rem 1rem 1rem 1em;min-height:200px;border:none;resize:none;outline:none;overflow:auto;white-space:pre;">{{ agents_content }}</textarea>
+                </div>
+
             </div>
         </div>
     </div>
@@ -159,8 +172,40 @@ Criar Gist
 
 <script>
 var AGENTS_RAW = '{{ agents_content|escapejs }}';
+var EDIT_MODE = 'view';
+
+document.addEventListener('DOMContentLoaded', function() {
+    var editor = document.getElementById('agents-editor');
+    var linesEl = document.getElementById('editor-lines');
+
+    function updateLineNumbers() {
+        var count = editor.value.split('\n').length;
+        var nums = '';
+        for (var i = 1; i <= count; i++) {
+            nums += i + '\n';
+        }
+        linesEl.textContent = nums;
+    }
+
+    function autoResize() {
+        editor.style.height = 'auto';
+        editor.style.height = editor.scrollHeight + 'px';
+    }
+
+    editor.addEventListener('input', function() {
+        updateLineNumbers();
+        autoResize();
+    });
+
+    editor.addEventListener('scroll', function() {
+        linesEl.scrollTop = this.scrollTop;
+    });
+});
 
 function _getContent() {
+    if (EDIT_MODE !== 'view') {
+        return document.getElementById('agents-editor').value;
+    }
     return AGENTS_RAW;
 }
 
@@ -197,6 +242,49 @@ function downloadContent() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+function toggleEditMode() {
+    var viewer = document.getElementById('agents-viewer');
+    var editor = document.getElementById('agents-editor');
+    var btn = document.getElementById('edit-btn');
+
+    if (EDIT_MODE === 'view') {
+        viewer.classList.add('hidden');
+        var wrapper = document.getElementById('editor-wrapper');
+        wrapper.classList.remove('hidden');
+        wrapper.style.display = 'flex';
+        editor.style.height = 'auto';
+        editor.style.height = editor.scrollHeight + 'px';
+        var count = editor.value.split('\n').length;
+        var nums = '';
+        for (var i = 1; i <= count; i++) { nums += i + '\n'; }
+        document.getElementById('editor-lines').textContent = nums;
+        EDIT_MODE = 'edit';
+        btn.innerHTML =
+            '<svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><span>Visualizar</span>';
+    } else {
+        var preEl = viewer.querySelector('pre');
+        var newCode = document.createElement('code');
+        newCode.id = 'agents-content';
+        newCode.className = 'hljs';
+        newCode.style.cssText = 'background:#282c34;color:#abb2bf;font-size:13px;line-height:1.45;white-space:pre;word-wrap:normal;padding:0;';
+        newCode.textContent = editor.value;
+        preEl.innerHTML = '';
+        preEl.appendChild(newCode);
+        viewer.classList.remove('hidden');
+        var wrapper = document.getElementById('editor-wrapper');
+        wrapper.style.display = '';
+        wrapper.classList.add('hidden');
+        hljs.highlightElement(newCode);
+        hljs.lineNumbersBlock(newCode);
+        EDIT_MODE = 'view';
+        btn.innerHTML =
+            '<svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span>Editar</span>';
+    }
+}
+
+function copyShareLink() {
 }
 
 function copyShareLink() {
