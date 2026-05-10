@@ -12,7 +12,12 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
     />
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'img/agentica-icon.png' %}"
+    />
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
     {% block extra_head %}{% endblock %}
   </head>
   <body>
@@ -22,8 +27,12 @@
           <div class="flex items-center">
             <a
               href="{% url 'index' %}"
-              class="text-base font-semibold text-primary"
-              >Agentica</a
+              class="text-base font-semibold text-primary flex items-center gap-1.5"
+              ><img
+                src="{% static 'img/agentica-icon.png' %}"
+                alt=""
+                class="w-8 h-8"
+              />Agentica</a
             >
           </div>
           <div class="flex items-center space-x-3">

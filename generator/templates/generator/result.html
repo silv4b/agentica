@@ -272,6 +272,7 @@ function toggleEditMode() {
         newCode.textContent = editor.value;
         preEl.innerHTML = '';
         preEl.appendChild(newCode);
+        AGENTS_RAW = editor.value;
         viewer.classList.remove('hidden');
         var wrapper = document.getElementById('editor-wrapper');
         wrapper.style.display = '';

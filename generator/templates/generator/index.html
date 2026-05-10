@@ -31,7 +31,7 @@
                         Gerar AGENTS.md
                     </button>
                     <span class="text-xs text-muted">
-                        Pressione <kbd class="px-1 py-0.5 border border-theme rounded text-xs bg-subtle text-secondary">Enter</kbd> ou <kbd class="px-1 py-0.5 border border-theme rounded text-xs bg-subtle text-secondary">,</kbd> para adicionar
+                        Pressione <kbd class="px-1 py-0.5 border border-theme rounded text-xs bg-subtle text-secondary">Tab</kbd> , <kbd class="px-1 py-0.5 border border-theme rounded text-xs bg-subtle text-secondary">Enter</kbd> ou <kbd class="px-1 py-0.5 border border-theme rounded text-xs bg-subtle text-secondary">,</kbd> para adicionar.
                     </span>
                 </div>
             </form>
@@ -73,14 +73,14 @@
                     <div class="mt-6 pt-6 border-t border-theme">
                         <p class="mb-4 text-sm text-secondary">
                             {% if supported_techs %}
-                                <span class="text-primary font-medium">{{ supported_techs|length }} tecnologias</span> suportadas. Digite uma tecnologia acima para começar:
+                                <span class="text-primary font-medium">{{ supported_techs|length }} tecnologias</span> suportadas. Digite uma tecnologia acima para começar.
                             {% else %}
                                 Pronto para criar seu AGENTS.md? Digite as tecnologias acima:
                             {% endif %}
                         </p>
                         <div class="flex flex-wrap gap-1.5">
                             {% for item in supported_with_icons %}
-                                <span class="px-2 py-0.5 text-xs border border-theme rounded hover:border-hover cursor-pointer text-secondary bg-hover tech-badge" data-tech="{{ item.key }}"><i class="{{ item.icon }} tech-icon"></i> {{ item.key }}</span>
+                                <span class="px-2 py-1 text-xs border border-theme rounded hover:border-hover cursor-pointer text-secondary bg-hover tech-badge flex items-center justify-center gap-1" data-tech="{{ item.key }}"><i class="{{ item.icon }} tech-icon"></i> {{ item.key }}</span>
                             {% endfor %}
                         </div>
                     </div>
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
     tagInput.addEventListener('input', function() {
         if (blurTimer) { clearTimeout(blurTimer); blurTimer = null; }
         const query = tagInput.value;
-        if (query.endsWith(',') || query.endsWith(';')) {
+        if (query.endsWith(';')) {
             const val = query.slice(0, -1).trim();
             if (val) addTag(val);
             tagInput.value = '';
@@ -246,26 +246,17 @@ document.addEventListener('DOMContentLoaded', function() {
     tagInput.addEventListener('keydown', function(e) {
         const items = dropdown.querySelectorAll('.dropdown-item');
 
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' || e.key === 'Tab' || e.key === ',') {
             e.preventDefault();
+            const raw = tagInput.value.replace(/,/g, '').trim();
             if (items.length > 0) {
                 const idx = activeIndex >= 0 ? activeIndex : 0;
                 if (addTag(items[idx].dataset.value)) {
                     tagInput.focus();
                 }
-            } else {
-                const val = tagInput.value.trim();
-                if (val) {
-                    addTag(val);
-                }
+            } else if (raw) {
+                addTag(raw);
             }
-            return;
-        }
-
-        if (e.key === ',') {
-            e.preventDefault();
-            const val = tagInput.value.replace(/,/g, '').trim();
-            if (val) addTag(val);
             return;
         }
 
