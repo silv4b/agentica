@@ -75,6 +75,15 @@ def _load_md(filename):
     return tmpl.content if tmpl else ""
 
 
+def _append_regen_link(content, matched, request):
+    """Appends a shareable URL at the end so the same result can be reproduced."""
+    if matched:
+        techs = ",".join(matched)
+        url = request.build_absolute_uri(f"/result/?tech={techs}")
+        content += f"\n<!-- Regen: {url} -->"
+    return content
+
+
 def index(request):
     """Exibe a página inicial com o formulário de seleção de tecnologias."""
     form = TechForm()
@@ -95,21 +104,10 @@ def index(request):
     )
 
 
-def result(request):
-    """Processa o formulário POST e renderiza a página com o AGENTS.md gerado."""
-    if request.method != "POST":
-        form = TechForm()
-        return render(request, "generator/index.html", {"form": form})
-
-    form = TechForm(request.POST)
-    if not form.is_valid():
-        return render(request, "generator/index.html", {"form": form})
-
-    agents_content, tech_list, matched, unmatched = _build_content(form.cleaned_data["technologies"])
-
+def _render_result(request, agents_content, tech_list, matched, unmatched):
+    """Renderiza a página de resultado com o AGENTS.md gerado."""
     techs = _get_tech_config()
     matched_with_icons = [{"key": t, "icon": techs[t].devicon} for t in matched if t in techs]
-
     return render(
         request,
         "generator/result.html",
@@ -123,6 +121,26 @@ def result(request):
     )
 
 
+def result(request):
+    """Processa o formulário (POST) ou parâmetro ?tech= (GET) e renderiza o AGENTS.md."""
+    if request.method == "GET":
+        raw_techs = request.GET.get("tech", "").strip()
+        if raw_techs:
+            agents_content, tech_list, matched, unmatched = _build_content(raw_techs)
+            agents_content = _append_regen_link(agents_content, matched, request)
+            return _render_result(request, agents_content, tech_list, matched, unmatched)
+        form = TechForm()
+        return render(request, "generator/index.html", {"form": form})
+
+    form = TechForm(request.POST)
+    if not form.is_valid():
+        return render(request, "generator/index.html", {"form": form})
+
+    agents_content, tech_list, matched, unmatched = _build_content(form.cleaned_data["technologies"])
+    agents_content = _append_regen_link(agents_content, matched, request)
+    return _render_result(request, agents_content, tech_list, matched, unmatched)
+
+
 def download(request):
     """Gera e força o download do arquivo AGENTS.md como attachment."""
     if request.method != "POST":
@@ -132,7 +150,8 @@ def download(request):
     if not form.is_valid():
         return HttpResponse(b"Invalid form", status=400)
 
-    agents_content, tech_list, _, _ = _build_content(form.cleaned_data["technologies"])
+    agents_content, tech_list, matched, _ = _build_content(form.cleaned_data["technologies"])
+    agents_content = _append_regen_link(agents_content, matched, request)
 
     filename = "AGENTS.md"
     response = HttpResponse(agents_content.encode("utf-8"), content_type="text/markdown; charset=utf-8")

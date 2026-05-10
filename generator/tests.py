@@ -9,6 +9,7 @@ from django.urls import reverse
 from generator.forms import TechForm
 from generator.models import Technology, Template
 from generator.views import (
+    _append_regen_link,
     _build_content,
     _load_md,
     _match_tech,
@@ -341,6 +342,39 @@ class LoadMdTests(TestCase):
         assert content == "# Python from DB"
 
 
+class AppendRegenLinkTests(TestCase):
+    def test_appends_regen_link_when_matched(self):
+        """Adiciona o comentário <!-- Regen: ... --> quando há tecnologias."""
+        from django.http import HttpRequest
+
+        request = HttpRequest()
+        request.META["SERVER_NAME"] = "testserver"
+        request.META["SERVER_PORT"] = "80"
+
+        content = "# Some content\n<!-- Build with Agentica -->"
+        result = _append_regen_link(content, ["python", "django"], request)
+        assert "<!-- Regen:" in result
+        assert "result/?tech=python%2Cdjango" in result or "result/?tech=python,django" in result
+
+    def test_does_not_append_when_no_techs(self):
+        """Não adiciona o link quando a lista de tecnologias está vazia."""
+        from django.http import HttpRequest
+
+        request = HttpRequest()
+        content = "# Some content"
+        result = _append_regen_link(content, [], request)
+        assert result == "# Some content"
+
+    def test_does_not_append_when_techs_none(self):
+        """Não adiciona o link quando matched é None."""
+        from django.http import HttpRequest
+
+        request = HttpRequest()
+        content = "# Some content"
+        result = _append_regen_link(content, None, request)
+        assert result == "# Some content"
+
+
 class BuildContentTests(TestCase):
     @patch("generator.views._load_md")
     def test_build_content_with_multiple_techs(self, mock_load_md):
@@ -491,6 +525,7 @@ class ResultViewTests(TestCase):
         )
         assert response.status_code == 200
         self.assertTemplateUsed(response, "generator/result.html")
+        assert "<!-- Regen:" in response.context["agents_content"]
 
     @patch("generator.views._load_md")
     def test_result_shows_matched_and_unmatched(self, mock_load_md):
@@ -512,6 +547,52 @@ class ResultViewTests(TestCase):
     def test_result_missing_technologies_field(self):
         """POST /result/ sem o campo technologies renderiza index com erros."""
         response = self.client.post(reverse("result"), {})
+        assert response.status_code == 200
+        self.assertTemplateUsed(response, "generator/index.html")
+
+    @patch("generator.views._load_md")
+    def test_result_get_with_tech_param(self, mock_load_md):
+        """GET /result/?tech=python renderiza result.html com o conteúdo gerado."""
+        mock_load_md.side_effect = lambda f: {
+            "general": "# General",
+            "python": "# Python",
+        }.get(f, "")
+
+        response = self.client.get(reverse("result"), {"tech": "python"})
+        assert response.status_code == 200
+        self.assertTemplateUsed(response, "generator/result.html")
+        assert response.context["matched"] == ["python"]
+        assert "<!-- Regen:" in response.context["agents_content"]
+
+    @patch("generator.views._load_md")
+    def test_result_get_with_tech_param_multiple(self, mock_load_md):
+        """GET /result/?tech=python,django renderiza result.html com ambas tecnologias."""
+        mock_load_md.side_effect = lambda f: {
+            "general": "# General",
+            "python": "# Python",
+            "django": "# Django",
+        }.get(f, "")
+
+        response = self.client.get(reverse("result"), {"tech": "python, django"})
+        assert response.status_code == 200
+        assert response.context["matched"] == ["python", "django"]
+        assert response.context["unmatched"] == []
+
+    @patch("generator.views._load_md")
+    def test_result_get_with_tech_param_unmatched(self, mock_load_md):
+        """GET /result/?tech=python,unknown_x separa tecnologias não reconhecidas."""
+        mock_load_md.side_effect = lambda f: {
+            "general": "# General",
+            "python": "# Python",
+        }.get(f, "")
+
+        response = self.client.get(reverse("result"), {"tech": "python, unknown_x"})
+        assert response.context["matched"] == ["python"]
+        assert response.context["unmatched"] == ["unknown_x"]
+
+    def test_result_get_with_empty_tech_param(self):
+        """GET /result/?tech= renderiza index.html."""
+        response = self.client.get(reverse("result"), {"tech": ""})
         assert response.status_code == 200
         self.assertTemplateUsed(response, "generator/index.html")
 
@@ -561,6 +642,7 @@ class DownloadViewTests(TestCase):
         )
         content = response.content.decode("utf-8")
         assert "Build with Agentica" in content
+        assert "<!-- Regen:" in content
 
 
 class CreateGistViewTests(TestCase):

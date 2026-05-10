@@ -44,6 +44,12 @@
                             </svg>
                             <span>Gist</span>
                         </button>
+                        <button onclick="copyShareLink()" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
+                            <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                            <span>Compartilhar</span>
+                        </button>
                         <a href="{% url 'index' %}" class="px-3 py-1 text-sm border border-theme rounded border-hover focus:outline-none bg-subtle text-secondary flex items-center space-x-1">
                             <svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M7 7h10v10M7 17L17 7" stroke-linecap="round" stroke-linejoin="round"/>
@@ -191,6 +197,18 @@ function downloadContent() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+function copyShareLink() {
+    const techs = '{{ matched|join:"," }}';
+    if (!techs) return;
+    const url = window.location.origin + '{% url "result" %}?tech=' + encodeURIComponent(techs);
+    navigator.clipboard.writeText(url).then(function() {
+        const btn = document.querySelector('[onclick="copyShareLink()"]');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<svg class="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Link copiado!</span>';
+        setTimeout(function() { btn.innerHTML = orig; }, 2000);
+    });
 }
 
 function closeGistModal() {
